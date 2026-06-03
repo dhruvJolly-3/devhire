@@ -6,8 +6,6 @@ AI-powered job board. Browse job listings, post new jobs, and generate tailored 
 
 ![Hero — Find your next role](public/screenshots/screenshot-1-hero.png)
 
-![Job Listings](public/screenshots/screenshot-2-jobs.png)
-
 ## Stack
 
 | Layer | Tech |
