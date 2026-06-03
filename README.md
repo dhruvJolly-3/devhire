@@ -2,6 +2,12 @@
 
 AI-powered job board. Browse job listings, post new jobs, and generate tailored cover letters using the Gemini API.
 
+## Preview
+
+| Hero | Job Listings | Job Detail |
+|---|---|---|
+| ![Hero](docs/devhire-preview-1.png) | ![Listings](docs/devhire-preview-3.png) | ![Detail](docs/devhire-preview-4.png) |
+
 ## Stack
 
 | Layer | Tech |
