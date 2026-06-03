@@ -1,16 +1,81 @@
-# React + Vite
+# DevHire
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+AI-powered job board. Browse job listings, post new jobs, and generate tailored cover letters using the Gemini API.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Layer | Tech |
+|---|---|
+| Frontend | React 19, Redux Toolkit, Tailwind CSS, Vite |
+| Backend | Node.js, Express, MongoDB Atlas, Mongoose |
+| AI | Google Gemini API |
+| Deploy | Vercel (frontend) · Render (backend) |
 
-## React Compiler
+## Features (V1)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Browse all job listings
+- Post a new job (title, company, description, salary)
+- Generate a cover letter for any listing via Gemini AI
+- Loading + error states on all async operations
 
-## Expanding the ESLint configuration
+## Local development
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Frontend
+```bash
+npm install
+npm run dev       # http://localhost:5173
+```
+
+### Backend
+```bash
+cd server
+npm install
+node server.js    # http://localhost:5000
+```
+
+### Environment variables
+
+Create `/.env` for frontend:
+```
+VITE_API_URL=http://localhost:5000
+```
+
+Create `/server/.env` for backend:
+```
+PORT=5000
+MONGODB_URI=your_mongodb_atlas_uri
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+## Project structure
+
+```
+devhire/
+  src/
+    components/     # JobCard, JobForm, JobList, Navbar
+    store/          # Redux store + jobSlice
+    services/       # axios API calls
+    utils/          # helpers
+  server/
+    models/         # Job.js Mongoose schema
+    routes/         # /api/jobs, /api/ai/cover
+    config/         # MongoDB connection
+    server.js       # Express entry point
+```
+
+## API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/jobs` | Fetch all jobs |
+| POST | `/api/jobs` | Create a new job |
+| POST | `/api/ai/cover` | Generate cover letter via Gemini |
+
+## Roadmap
+
+- [ ] Job listings page
+- [ ] Post a job form
+- [ ] Gemini cover letter generation
+- [ ] Backend REST API
+- [ ] MongoDB Atlas integration
+- [ ] Deploy to Vercel + Render
