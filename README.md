@@ -2,7 +2,7 @@
 
 AI-powered job board. Browse job listings, post new jobs, and generate tailored cover letters using the Gemini API.
 
-## Screenshots
+## App Overview
 
 ![Hero — Find your next role](public/screenshots/screenshot-1-hero.png)
 
