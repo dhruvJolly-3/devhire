@@ -1,6 +1,7 @@
 .env
 .env.*
 .claude/
+CLAUDE.md
 
 # Logs
 logs
