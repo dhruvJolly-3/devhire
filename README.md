@@ -1,6 +1,10 @@
 # DevHire
 
-AI-powered job board. Browse job listings, post new jobs, and generate tailored cover letters using the Gemini API.
+Full-stack job board for developer roles at Indian startups. Employers post openings, candidates browse and filter them.
+
+## Live Demo
+
+🔗 **https://devhire-neon.vercel.app**
 
 ## App Overview
 
@@ -10,19 +14,28 @@ AI-powered job board. Browse job listings, post new jobs, and generate tailored 
 
 | Layer | Tech |
 |---|---|
-| Frontend | React 19, Redux Toolkit, Tailwind CSS, Vite |
+| Frontend | React 19, Vite, Tailwind CSS |
 | Backend | Node.js, Express, MongoDB Atlas, Mongoose |
-| AI | Google Gemini API |
+| Auth | JWT, bcrypt |
 | Deploy | Vercel (frontend) · Render (backend) |
 
-## Features (V1)
+## Features
 
-- Browse all job listings
-- Post a new job (title, company, description, salary)
-- Generate a cover letter for any listing via Gemini AI
-- Loading + error states on all async operations
+- Browse job listings with search, stack filters, and sorting
+- Register / login with JWT authentication (bcrypt-hashed passwords)
+- Post a job (protected — authenticated users only)
+- Job detail pages
+- Dark / light mode with persistence
+- Responsive layout, loading and error states on all async operations
 
 ## Local development
+
+### Backend
+```bash
+cd server
+npm install
+npm run dev       # http://localhost:5001
+```
 
 ### Frontend
 ```bash
@@ -30,56 +43,37 @@ npm install
 npm run dev       # http://localhost:5173
 ```
 
-### Backend
-```bash
-cd server
-npm install
-node server.js    # http://localhost:5000
-```
-
 ### Environment variables
 
-Create `/.env` for frontend:
-```
-VITE_API_URL=http://localhost:5000
-```
+`/server/.env`:
 
-Create `/server/.env` for backend:
-```
-PORT=5000
+PORT=5001
 MONGODB_URI=your_mongodb_atlas_uri
-GEMINI_API_KEY=your_gemini_api_key
-```
+JWT_SECRET=your_jwt_secret
+CORS_ORIGINS=https://your-frontend-domain
 
-## Project structure
+`/.env` (frontend, optional — defaults to localhost):
 
-```
-devhire/
-  src/
-    components/     # JobCard, JobForm, JobList, Navbar
-    store/          # Redux store + jobSlice
-    services/       # axios API calls
-    utils/          # helpers
-  server/
-    models/         # Job.js Mongoose schema
-    routes/         # /api/jobs, /api/ai/cover
-    config/         # MongoDB connection
-    server.js       # Express entry point
-```
+VITE_API_URL=http://localhost:5001/api
 
 ## API
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/jobs` | Fetch all jobs |
-| POST | `/api/jobs` | Create a new job |
-| POST | `/api/ai/cover` | Generate cover letter via Gemini |
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| POST | `/api/auth/register` | — | Create account |
+| POST | `/api/auth/login` | — | Login, returns JWT |
+| GET | `/api/jobs` | — | Fetch all jobs |
+| GET | `/api/jobs/:id` | — | Fetch single job |
+| POST | `/api/jobs` | ✓ | Create a job |
+| PUT | `/api/jobs/:id` | ✓ | Update own job |
+| DELETE | `/api/jobs/:id` | ✓ | Delete own job |
 
 ## Roadmap
 
-- [ ] Job listings page
-- [ ] Post a job form
-- [ ] Gemini cover letter generation
-- [ ] Backend REST API
-- [ ] MongoDB Atlas integration
-- [ ] Deploy to Vercel + Render
+- [x] Backend REST API with JWT auth
+- [x] MongoDB Atlas integration
+- [x] Job listings, filters, search, detail pages
+- [x] Post a job (protected)
+- [x] Deploy to Vercel + Render
+- [ ] AI-powered candidate–JD matching
+- [ ] Cover letter generation
