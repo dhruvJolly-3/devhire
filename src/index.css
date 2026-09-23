@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design-source globals ────────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+body { margin: 0; -webkit-font-smoothing: antialiased; }
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Mascot idle float */
+@keyframes mascotFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-14px); }
+}
+
+/* Floating hero pills — each pill gets its own drift */
+@keyframes float0 { 0%,100%{transform:translate(0,0)}   50%{transform:translate(8px,-14px)} }
+@keyframes float1 { 0%,100%{transform:translate(0,0)}   50%{transform:translate(-10px,-18px)} }
+@keyframes float2 { 0%,100%{transform:translate(0,0)}   50%{transform:translate(-12px,10px)} }
+@keyframes float3 { 0%,100%{transform:translate(0,0)}   50%{transform:translate(12px,12px)} }
+@keyframes float4 { 0%,100%{transform:translate(0,0)}   50%{transform:translate(-8px,-12px)} }
+@keyframes float5 { 0%,100%{transform:translate(0,0)}   50%{transform:translate(10px,14px)} }
+
+/* Job card entrance */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Companies marquee — track is duplicated, so -50% loops seamlessly */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track { animation: marquee 34s linear infinite; }
+.marquee-track:hover { animation-play-state: paused; }
+
+/* Live pulse dot */
+@keyframes livePulse {
+  0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 rgba(15,110,86,0.5); }
+  50%      { opacity: 0.6; box-shadow: 0 0 0 5px rgba(15,110,86,0); }
+}
+.live-dot { animation: livePulse 2s ease-in-out infinite; }
+
+/* Hero ambient glow */
+@keyframes heroGlow {
+  0%, 100% { opacity: 0.85; transform: translate(-50%,-50%) scale(1); }
+  50%      { opacity: 1;    transform: translate(-50%,-50%) scale(1.06); }
+}
+.hero-glow { animation: heroGlow 9s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: 1ms !important; }
+}
