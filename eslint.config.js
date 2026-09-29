@@ -18,4 +18,9 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    // The Express API is CommonJS on Node.
+    files: ['server/**/*.js'],
+    languageOptions: { globals: globals.node, sourceType: 'commonjs' },
+  },
 ])

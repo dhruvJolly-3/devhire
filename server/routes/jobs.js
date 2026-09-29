@@ -2,6 +2,7 @@ const router = require('express').Router();
 const auth = require('../middleware/auth');
 const mongoose = require('mongoose');
 const Job = require('../models/Job');
+const Application = require('../models/Application');
 const { cityOf } = require('../utils/jobText');
 
 const SUMMARY_CHARS = 280;
@@ -82,6 +83,8 @@ router.delete('/:id', auth, async (req, res) => {
     if (!job.postedBy || job.postedBy.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Not authorized' });
     }
+    // Remove its saves and applications too, so no dangling rows remain.
+    await Application.deleteMany({ job: job._id });
     await job.deleteOne();
     res.json({ message: 'Job deleted' });
   } catch (err) {

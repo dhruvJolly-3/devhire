@@ -48,6 +48,8 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/jobs', require('./routes/jobs'));
 app.use('/api/ai', require('./routes/ai'));
 app.use('/api/me', require('./routes/me'));
+app.use('/api/employer', require('./routes/employer'));
+app.use('/api/companies', require('./routes/companies'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'DevHire API running' }));
 

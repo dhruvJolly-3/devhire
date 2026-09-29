@@ -9,6 +9,9 @@
 //   #/post        post a job
 //   #/me          my saved & applied jobs
 //   #/profile     my profile & resume
+//   #/dashboard   employer dashboard (my listings + applicants)
+//   #/post/:id    edit one of my listings
+//   #/company/:n  company page
 
 export function parseHash(hash = window.location.hash) {
   const raw = hash.replace(/^#/, '') || '/';
@@ -27,7 +30,9 @@ export function resolveRoute({ parts, query }, user) {
   }
   if (first === 'jobs' && second) return { page: 'detail', jobId: second };
   if (first === 'jobs') return { page: 'home', q: query.get('q') || '' };
-  if (first === 'post') return { page: 'post' };
+  if (first === 'post') return user ? { page: 'post', editId: second || null } : { page: 'post', editId: null };
+  if (first === 'dashboard') return user ? { page: 'dash' } : { redirect: '/login?next=/dashboard' };
+  if (first === 'company' && second) return { page: 'company', company: decodeURIComponent(second) };
   if (first === 'me') return user ? { page: 'me' } : { redirect: '/login?next=/me' };
   if (first === 'profile') return user ? { page: 'profile' } : { redirect: '/login?next=/profile' };
   return { redirect: user ? '/jobs' : '/' };

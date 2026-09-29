@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const auth = require('../middleware/auth');
 const Job = require('../models/Job');
 const Application = require('../models/Application');
+const { matchScore } = require('../utils/match');
 
 router.use(auth);
 
@@ -12,7 +13,7 @@ const JOB_FIELDS = 'title company location city type tags salary expLevel source
 // Loads the job named in the URL, or answers 404.
 async function findJob(req, res) {
   const { jobId } = req.params;
-  const job = mongoose.isValidObjectId(jobId) ? await Job.findById(jobId).select('_id applyUrl') : null;
+  const job = mongoose.isValidObjectId(jobId) ? await Job.findById(jobId).select('_id applyUrl tags') : null;
   if (!job) res.status(404).json({ message: 'Job not found' });
   return job;
 }
@@ -27,7 +28,7 @@ router.get('/jobs', async (req, res) => {
     const live = rows.filter(r => r.job);   // skip jobs that have since been removed
     res.json({
       saved: live.filter(r => r.saved).map(r => r.job),
-      applied: live.filter(r => r.appliedAt).map(r => ({ job: r.job, appliedAt: r.appliedAt })),
+      applied: live.filter(r => r.appliedAt).map(r => ({ job: r.job, appliedAt: r.appliedAt, status: r.status || 'New' })),
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -61,13 +62,17 @@ router.delete('/saved/:jobId', async (req, res) => {
 // POST /api/me/applied/:jobId — record an application (idempotent).
 router.post('/applied/:jobId', async (req, res) => {
   try {
-    if (!(await findJob(req, res))) return;
+    const job = await findJob(req, res);
+    if (!job) return;
+    const existing = await Application.findOne({ user: req.user._id, job: job._id });
+    if (existing?.appliedAt) return res.status(200).json({ appliedAt: existing.appliedAt, status: existing.status });
+    // First application: stamp it and score the fit for the employer.
     const row = await Application.findOneAndUpdate(
-      { user: req.user._id, job: req.params.jobId },
-      { $setOnInsert: { saved: false }, $min: { appliedAt: new Date() } },
-      { upsert: true, new: true },
+      { user: req.user._id, job: job._id },
+      { $set: { appliedAt: new Date(), status: 'New', match: matchScore(req.user, job) } },
+      { upsert: true, new: true, setDefaultsOnInsert: true },
     );
-    res.status(201).json({ appliedAt: row.appliedAt });
+    res.status(201).json({ appliedAt: row.appliedAt, status: row.status });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
