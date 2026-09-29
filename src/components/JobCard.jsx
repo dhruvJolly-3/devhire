@@ -3,10 +3,9 @@ import { tk, MONO, SANS } from '../theme';
 import { CompanyAvatar, InlineIcon } from './ui';
 import useInView from '../hooks/useInView';
 
-// Design parity note: the source file coloured the card by an AI `match`
-// score and showed a "⌁ 96%" badge. That feature is cut, so the card uses the
-// theme accent for its rail/hover and drops the badge entirely.
-export default function JobCard({ job, dark, onClick, mobile, idx = 0 }) {
+// One row in a job list. `onToggleSave` adds the ☆ save button; `applied`
+// shows a "✓ Applied" badge.
+export default function JobCard({ job, dark, onClick, mobile, idx = 0, saved, applied, onToggleSave }) {
   const t = tk(dark);
   const [hov, setHov] = useState(false);
   const [ref, visible] = useInView(0.08);
@@ -54,6 +53,7 @@ export default function JobCard({ job, dark, onClick, mobile, idx = 0 }) {
           {job.type !== 'Remote' && (<><span style={{ color:t.t3, fontSize:12 }}>·</span><span style={{ fontFamily:MONO, fontSize:12, color:t.t3 }}>{job.type}</span></>)}
           {job.exp && (<><span style={{ color:t.t3, fontSize:12 }}>·</span><span style={{ fontFamily:MONO, fontSize:12, color:t.t3 }}>{job.exp}</span></>)}
           {job.salary && (<><span style={{ color:t.t3, fontSize:12 }}>·</span><span style={{ fontFamily:MONO, fontSize:12, color:t.t3 }}>{job.salary}</span></>)}
+          {job.sourceLabel && (<><span style={{ color:t.t3, fontSize:12 }}>·</span><span style={{ fontFamily:MONO, fontSize:11, color:t.accent }}>via {job.sourceLabel}</span></>)}
         </div>
 
         {/* Row 3 — tags */}
@@ -65,13 +65,26 @@ export default function JobCard({ job, dark, onClick, mobile, idx = 0 }) {
         </div>
       </div>
 
-      {/* Right — timestamp + chevron */}
-      {!mobile && (
-        <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
-          <span style={{ fontFamily:MONO, fontSize:12, color:t.t3 }}>{job.posted}</span>
-          <span style={{ opacity:hov?1:0, transform:hov?'translateX(0)':'translateX(-6px)', transition:'opacity 180ms,transform 180ms', color:t.t2, fontSize:15 }}>→</span>
-        </div>
-      )}
+      {/* Right — applied badge, save, timestamp + chevron */}
+      <div style={{ display:'flex', alignItems:'center', gap:10, flexShrink:0, ...(mobile ? { position:'absolute', top:14, right:14 } : {}) }}>
+        {applied && (
+          <span style={{ fontFamily:MONO, fontSize:10, fontWeight:600, color:t.success, background:dark?'rgba(22,168,120,0.14)':'rgba(15,110,86,0.10)', padding:'3px 8px', borderRadius:99 }}>✓ Applied</span>
+        )}
+        {onToggleSave && (
+          <button type="button" aria-label={saved ? 'Remove from saved jobs' : 'Save job'} title={saved ? 'Saved' : 'Save job'}
+            onClick={e => { e.stopPropagation(); onToggleSave(job); }}
+            style={{ width:34, height:34, borderRadius:10, border:`1px solid ${saved ? t.accent : t.border}`, background:saved ? `${t.accent}18` : 'transparent',
+              color:saved ? t.accent : t.t3, cursor:'pointer', fontSize:15, lineHeight:1, display:'flex', alignItems:'center', justifyContent:'center', transition:'all 160ms' }}>
+            {saved ? '★' : '☆'}
+          </button>
+        )}
+        {!mobile && (
+          <>
+            <span style={{ fontFamily:MONO, fontSize:12, color:t.t3, minWidth:52, textAlign:'right' }}>{job.posted}</span>
+            <span style={{ opacity:hov?1:0, transform:hov?'translateX(0)':'translateX(-6px)', transition:'opacity 180ms,transform 180ms', color:t.t2, fontSize:15 }}>→</span>
+          </>
+        )}
+      </div>
     </div>
   );
 }

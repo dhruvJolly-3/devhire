@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const { startJobSync } = require('./services/jobSync');
 
 for (const key of ['MONGODB_URI', 'JWT_SECRET']) {
   if (!process.env[key]) {
@@ -45,6 +46,8 @@ app.use(express.json());
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/jobs', require('./routes/jobs'));
+app.use('/api/ai', require('./routes/ai'));
+app.use('/api/me', require('./routes/me'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'DevHire API running' }));
 
@@ -53,6 +56,7 @@ app.get('/api/health', (req, res) => res.json({ status: 'DevHire API running' })
 const PORT = process.env.PORT || 5001;
 
 connectDB().then(() => {
+  startJobSync();
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`CORS allowlist: ${allowedOrigins.join(', ')}`);

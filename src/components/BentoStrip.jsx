@@ -92,9 +92,8 @@ const BentoStat = ({ dark, t, target, label, sub, icon, hoverBg, hoverBorder, vi
     </div>
   );
 };
-
-// AI card — no score, no progress bar. The feature is not live, so the card
-// only carries the "launching soon" promise the hero badge already makes.
+// AI card — no score, no progress bar; it points at the AI match score on
+// every job page.
 const BentoAI = ({ dark, t }) => {
   const [hov, setHov] = useState(false);
   const hoverAccent = dark ? '#8F82FF' : '#6D61FF';
@@ -114,7 +113,7 @@ const BentoAI = ({ dark, t }) => {
       <span style={{ fontFamily:MONO, fontSize:40, fontWeight:600, color:'#fff', letterSpacing:'-0.045em', lineHeight:1 }}>⌁</span>
       <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
         <span style={{ fontFamily:SANS, fontSize:13, color:'rgba(255,255,255,0.75)' }}>AI matching</span>
-        <span style={{ fontFamily:MONO, fontSize:11, color:'rgba(255,255,255,0.9)', background:'rgba(255,255,255,0.18)', padding:'2px 7px', borderRadius:99 }}>launching soon</span>
+        <span style={{ fontFamily:MONO, fontSize:11, color:'rgba(255,255,255,0.9)', background:'rgba(255,255,255,0.18)', padding:'2px 7px', borderRadius:99 }}>now live</span>
       </div>
     </div>
   );

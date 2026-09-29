@@ -51,7 +51,7 @@ export default function MascotHero({ dark }) {
         transform: hov ? 'translateY(0) scale(1)' : 'translateY(8px) scale(0.95)',
         transition:'opacity 220ms ease, transform 220ms ease',
         pointerEvents:'none', boxShadow:`0 8px 24px ${dark?'rgba(0,0,0,0.4)':'rgba(0,0,0,0.1)'}`, zIndex:2, whiteSpace:'nowrap' }}>
-        <span style={{ fontFamily:MONO, fontSize:11, color:accent, fontWeight:600 }}>⌁ AI matching — launching soon</span>
+        <span style={{ fontFamily:MONO, fontSize:11, color:accent, fontWeight:600 }}>⌁ AI matching — now live</span>
       </div>
     </div>
   );

@@ -38,7 +38,7 @@ export default function JobCarousel({ jobs, dark, onJobClick, mobile }) {
     if (animating || newPage < 0 || newPage >= totalPages) return;
     setDir(direction);
     setAnimating(true);
-    setTimeout(() => { setPage(newPage); setDir(0); setAnimating(false); }, 320);
+    setTimeout(() => { setPage(newPage); setDir(0); setAnimating(false); }, 200);
   };
 
   const visible = jobs.slice(page * perPage, page * perPage + perPage);
@@ -61,7 +61,9 @@ export default function JobCarousel({ jobs, dark, onJobClick, mobile }) {
         gap:12,
         opacity: animating ? 0 : 1,
         transform: animating ? `translateX(${dir * -24}px)` : 'translateX(0)',
-        transition: animating ? 'none' : 'opacity 300ms ease, transform 300ms ease',
+        transition: animating
+          ? 'opacity 200ms ease-in, transform 200ms ease-in'
+          : 'opacity 360ms cubic-bezier(.22,1,.36,1), transform 360ms cubic-bezier(.22,1,.36,1)',
       }}>
         {visible.map((job, i) => (
           <JobCard key={job.id} job={job} dark={dark} onClick={onJobClick} mobile={mobile} idx={i}/>

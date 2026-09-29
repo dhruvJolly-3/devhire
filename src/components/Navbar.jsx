@@ -34,11 +34,12 @@ export default function Navbar({ dark, onToggleDark, onNavigate, currentPage, mo
         backdropFilter:(scrolled||drawerOpen)?'blur(16px)':'none',
         transition:'background 280ms,border-color 280ms' }}>
         <div style={{ maxWidth:1200, margin:'0 auto', padding:compact?'0 20px':'0 32px', height:'100%', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-          <Wordmark dark={dark} onClick={() => handleNav('home')}/>
+          <Wordmark dark={dark} onClick={() => handleNav('landing')}/>
 
           {!compact && (
             <div style={{ display:'flex', alignItems:'center', gap:28 }}>
               <NavLink label="Jobs" dark={dark} onClick={() => handleNav('home')} active={currentPage==='home'}/>
+              {user && <NavLink label="My jobs" dark={dark} onClick={() => handleNav('me')} active={currentPage==='me'}/>}
               <NavLink label="For companies" dark={dark} onClick={() => handleNav('post')} active={currentPage==='post'}/>
               <button onClick={onToggleDark}
                 style={{ background:'none', border:`1px solid ${t.border}`, borderRadius:99, padding:'5px 12px', cursor:'pointer', fontFamily:MONO, fontSize:11, color:t.t3, letterSpacing:'0.05em', transition:'all 150ms' }}>
@@ -46,7 +47,10 @@ export default function Navbar({ dark, onToggleDark, onNavigate, currentPage, mo
               </button>
               {user ? (
                 <>
-                  <span style={{ fontFamily:MONO, fontSize:12, color:t.t2 }}>{user.name || user.email}</span>
+                  <button onClick={() => handleNav('profile')} title="Your profile"
+                    style={{ background:'none', border:'none', padding:0, cursor:'pointer', fontFamily:MONO, fontSize:12, color:currentPage==='profile' ? t.accent : t.t2 }}>
+                    {user.name || user.email}
+                  </button>
                   <button onClick={onLogout}
                     style={{ background:'none', border:`1px solid ${t.border}`, borderRadius:99, padding:'8px 18px', cursor:'pointer', fontFamily:SANS, fontSize:14, color:t.t1, transition:'all 150ms' }}>
                     Sign out
@@ -78,7 +82,7 @@ export default function Navbar({ dark, onToggleDark, onNavigate, currentPage, mo
 
       {drawerOpen && (
         <div style={{ position:'fixed', top:64, left:0, right:0, zIndex:49, background:t.surface, borderBottom:`1px solid ${t.border}`, padding:'12px 20px 24px', display:'flex', flexDirection:'column', gap:0, boxShadow:`0 12px 32px ${dark?'rgba(0,0,0,0.5)':'rgba(0,0,0,0.08)'}` }}>
-          {[['Jobs','home'],['For companies','post']].map(([label, page]) => (
+          {[['Jobs','home'], ...(user ? [['My jobs','me'], ['Profile','profile']] : []), ['For companies','post']].map(([label, page]) => (
             <button key={label} onClick={() => handleNav(page)}
               style={{ textAlign:'left', padding:'14px 0', fontFamily:SANS, fontSize:16, fontWeight:400, color:t.t1, background:'none', border:'none', borderBottom:`1px solid ${t.border}`, cursor:'pointer' }}>
               {label}

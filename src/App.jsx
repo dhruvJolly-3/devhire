@@ -4,11 +4,21 @@ import { Wordmark } from './components/ui';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LiveWidget from './components/LiveWidget';
+import AuthForm from './components/AuthForm';
+import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
 import JobDetailPage from './pages/JobDetailPage';
 import PostJobPage from './pages/PostJobPage';
 import AuthPage from './pages/AuthPage';
+import MyJobsPage from './pages/MyJobsPage';
+import ProfilePage from './pages/ProfilePage';
 import useJobs from './hooks/useJobs';
+import useMyJobs from './hooks/useMyJobs';
+import useProfile from './hooks/useProfile';
+import { parseHash, resolveRoute, go, replace, jobPath, loginPath } from './utils/routes';
+
+// Page names used by the navbar and other components → URL paths.
+const PATHS = { landing:'/', home:'/jobs', post:'/post', auth:'/login', me:'/me', profile:'/profile' };
 
 const readStoredUser = () => {
   try {
@@ -21,13 +31,17 @@ const readStoredUser = () => {
 
 export default function App() {
   const [dark, setDark] = useState(() => localStorage.getItem('theme') === 'dark');
-  const [page, setPage] = useState('home');
-  const [activeJob, setActiveJob] = useState(null);
+  // The current URL (#/jobs, #/jobs/123 …). See utils/routes.js.
+  const [location, setLocation] = useState(parseHash);
   const [transitioning, setTransitioning] = useState(false);
   const [mobile, setMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 760 : false);
   const [user, setUser] = useState(readStoredUser);
+  const [signedOut, setSignedOut] = useState(false);
 
   const { jobs, loading, error, reload } = useJobs();
+  const my = useMyJobs(user);
+  const { profile, save: saveProfile, uploadResume } = useProfile(user);
+  const route = resolveRoute(location, user);
 
   // Loading splash — advances on a timer but will not dismiss before the
   // first /api/jobs response has landed.
@@ -52,6 +66,12 @@ export default function App() {
 
   useEffect(() => {
     localStorage.setItem('theme', dark ? 'dark' : 'light');
+    // Paint the page itself in the theme colour, so the macOS scroll bounce
+    // (and any area outside the app) never shows the browser's white.
+    const bg = tk(dark).bg;
+    document.documentElement.style.backgroundColor = bg;
+    document.body.style.backgroundColor = bg;
+    document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
   }, [dark]);
 
   useEffect(() => {
@@ -60,28 +80,70 @@ export default function App() {
     return () => window.removeEventListener('resize', r);
   }, []);
 
-  const navigate = useCallback((next, job = null) => {
-    setTransitioning(true);
-    setTimeout(() => {
-      setPage(next);
-      setActiveJob(job);
-      window.scrollTo(0, 0);
-      setTimeout(() => setTransitioning(false), 40);
-    }, 260);
+  // URL change (link, back/forward, redirect): fade the current page out,
+  // swap while it is invisible, jump to the top, then fade the new page in.
+  useEffect(() => {
+    let timer = 0;
+    const onHash = () => {
+      clearTimeout(timer);
+      setTransitioning(true);
+      timer = setTimeout(() => {
+        setLocation(parseHash());
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        requestAnimationFrame(() => requestAnimationFrame(() => setTransitioning(false)));
+      }, 240);
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => { window.removeEventListener('hashchange', onHash); clearTimeout(timer); };
   }, []);
+
+  // Routes that only redirect (e.g. #/ when signed in → #/jobs).
+  useEffect(() => {
+    if (route.redirect) replace(route.redirect);
+  }, [route.redirect]);
+
+  const navigate = useCallback((name, job = null) => {
+    if (name === 'detail' && job) go(jobPath(job));
+    else go(PATHS[name] || '/jobs');
+  }, []);
+
+  // Actions that need an account send signed-out users to sign in first,
+  // then straight back to `next`.
+  const requireAuth = (next) => {
+    if (user) return true;
+    setSignedOut(false);
+    // Replace, not push: after signing in, the login entry is replaced by
+    // `next`, so Back leads to where the user was before — not the same page.
+    replace(loginPath(next));
+    return false;
+  };
+
+  const toggleSave = (job) => { if (requireAuth(window.location.hash.slice(1))) my.toggleSave(job); };
+
+  const applyTo = (job) => {
+    if (!requireAuth(jobPath(job))) return;
+    // Open the tab first — browsers block popups opened after an await.
+    if (job.applyUrl) window.open(job.applyUrl, '_blank', 'noopener,noreferrer');
+    my.markApplied(job);
+  };
 
   const handleAuthed = (u) => {
     setUser(u);
+    setSignedOut(false);
     try { localStorage.setItem('user', JSON.stringify(u)); } catch { /* storage unavailable */ }
-    navigate('post');
+    replace(route.next || '/jobs');
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
-    navigate('home');
+    setSignedOut(true);
+    go('/login');
   };
+
+  const page = route.page;
+  const detailJob = page === 'detail' ? jobs.find(j => j.id === route.jobId) || null : null;
 
   const t = tk(dark);
   const loadLabel = progress < 45 ? 'CONNECTING TO API…' : progress < 80 ? 'FETCHING JOBS…' : progress < 100 ? 'ALMOST THERE…' : 'READY';
@@ -119,28 +181,60 @@ export default function App() {
       )}
 
       <Navbar dark={dark} onToggleDark={() => setDark(d => !d)} onNavigate={navigate}
-        currentPage={page} mobile={mobile} user={user} onLogout={handleLogout}/>
+        currentPage={page === 'detail' ? 'home' : page} mobile={mobile} user={user} onLogout={handleLogout}/>
 
-      <div style={{ opacity:transitioning?0:1, transform:transitioning?'translateY(10px)':'translateY(0)', transition:transitioning?'none':'opacity 280ms ease,transform 280ms ease' }}>
-        {page === 'home' && (
-          <HomePage dark={dark} mobile={mobile} jobs={jobs} loading={loading} error={error} onRetry={reload}
-            onJobClick={job => navigate('detail', job)}/>
+      <div className="page-transition" style={{
+        opacity: transitioning ? 0 : 1,
+        transform: transitioning ? 'translateY(12px) scale(0.995)' : 'none',
+        filter: transitioning ? 'blur(4px)' : 'none',
+        transition: transitioning
+          ? 'opacity 220ms ease-in, transform 220ms ease-in, filter 220ms ease-in'
+          : 'opacity 420ms cubic-bezier(.22,1,.36,1), transform 420ms cubic-bezier(.22,1,.36,1), filter 420ms ease-out',
+      }}>
+        {page === 'landing' && (
+          <LandingPage dark={dark} mobile={mobile} jobs={jobs}
+            onBrowse={q => go(q ? `/jobs?q=${encodeURIComponent(q)}` : '/jobs')}
+            onPost={() => navigate('post')}
+            onJobClick={job => navigate('detail', job)}
+            authSlot={<AuthForm dark={dark} compact mode={location.query.get('mode') === 'register' ? 'register' : 'login'}
+              onModeChange={m => replace(m === 'register' ? '/?mode=register' : '/')} onAuthed={handleAuthed}/>}/>
         )}
-        {page === 'detail' && activeJob && (
-          <JobDetailPage dark={dark} mobile={mobile} job={activeJob} onBack={() => navigate('home')}/>
+        {page === 'home' && (
+          <HomePage key={route.q} dark={dark} mobile={mobile} jobs={jobs} loading={loading} error={error} onRetry={reload}
+            initialQuery={route.q} onJobClick={job => navigate('detail', job)}
+            savedIds={my.savedIds} appliedIds={my.appliedIds} onToggleSave={toggleSave}/>
+        )}
+        {page === 'detail' && (
+          <JobDetailPage key={route.jobId} dark={dark} mobile={mobile} jobId={route.jobId} listJob={detailJob} user={user}
+            saved={my.savedIds.has(route.jobId)} applied={my.appliedIds.has(route.jobId)}
+            onToggleSave={toggleSave} onApply={applyTo}
+            onBack={() => (window.history.length > 1 ? window.history.back() : go('/jobs'))}
+            onSignIn={() => go(loginPath(jobPath({ id: route.jobId })))}
+            profile={profile} onEditProfile={() => go('/profile')}/>
         )}
         {page === 'post' && (
           <PostJobPage dark={dark} mobile={mobile} user={user}
-            onPosted={reload} onSignIn={() => navigate('auth')}/>
+            onPosted={reload} onSignIn={() => go(loginPath('/post'))}/>
+        )}
+        {page === 'me' && (
+          <MyJobsPage dark={dark} mobile={mobile} saved={my.saved} applied={my.applied}
+            savedIds={my.savedIds} appliedIds={my.appliedIds} onToggleSave={toggleSave}
+            onJobClick={job => navigate('detail', job)} onBrowse={() => go('/jobs')}/>
+        )}
+        {page === 'profile' && (
+          <ProfilePage dark={dark} mobile={mobile} profile={profile} onSave={saveProfile} onUpload={uploadResume}/>
         )}
         {page === 'auth' && (
-          <AuthPage dark={dark} mobile={mobile} onAuthed={handleAuthed}/>
+          <AuthPage dark={dark} mobile={mobile} mode={route.mode === 'register' ? 'register' : 'login'}
+            onModeChange={m => replace(`/${m}${route.next ? `?next=${encodeURIComponent(route.next)}` : ''}`)}
+            onAuthed={handleAuthed} signedOut={signedOut} next={route.next}
+            onBrowse={() => { setSignedOut(false); go('/jobs'); }}/>
         )}
       </div>
 
       <Footer dark={dark}/>
 
-      {!mobile && <LiveWidget dark={dark} jobs={jobs} onViewAll={() => navigate('home')}/>}
+      {!mobile && page === 'landing' && <LiveWidget dark={dark} jobs={jobs} onViewAll={() => go('/jobs')}/>}
     </div>
   );
 }

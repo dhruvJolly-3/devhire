@@ -35,16 +35,31 @@ export const relativeTime = (iso) => {
   return `${Math.floor(days / 30)}mo ago`;
 };
 
-export const normalizeJob = (raw) => ({
+const SOURCE_LABELS = { remotive: 'Remotive', arbeitnow: 'Arbeitnow', greenhouse: 'Greenhouse', adzuna: 'Adzuna' };
+
+// Minimum years of experience from strings like "2–4y exp", "0-1 yrs",
+// "Fresher". null when the job doesn't say.
+export const minYears = (exp = '') => {
+  if (/fresher|entry|intern|graduate/i.test(exp)) return 0;
+  const m = exp.match(/(\d+)/);
+  return m ? Number(m[1]) : null;
+};
+
+export const normalizeJob = (raw) => normalizeFields({ ...raw, createdAt: raw.postedAt || raw.createdAt });
+
+const normalizeFields = (raw) => ({
   id: raw._id || raw.id,
   title: raw.title || 'Untitled role',
   company: raw.company || 'Unknown',
   description: raw.description || '',
   salary: raw.salary || '',
   location: raw.location || 'Remote',
+  city: raw.city || 'Other',
   type: ['Remote', 'Hybrid', 'Onsite'].includes(raw.type) ? raw.type : 'Remote',
   tags: Array.isArray(raw.tags) ? raw.tags.filter(Boolean) : [],
   exp: raw.expLevel || '',
+  minYears: minYears(raw.expLevel || ''),
+  ageHours: raw.createdAt ? (Date.now() - new Date(raw.createdAt).getTime()) / 3600000 : Infinity,
   posted: relativeTime(raw.createdAt),
   // Evaluated when the response is normalised, so render stays pure.
   postedThisWeek: raw.createdAt
@@ -57,6 +72,10 @@ export const normalizeJob = (raw) => ({
   domain: raw.domain || '',
   color: raw.color || FALLBACK_COLORS[hashCode(raw.company || '') % FALLBACK_COLORS.length],
   initials: raw.logoInitials || initialsFor(raw.company),
+  // Imported listings (see server/services/jobSync.js) link out to apply.
+  source: raw.source || 'devhire',
+  sourceLabel: SOURCE_LABELS[raw.source] || '',
+  applyUrl: raw.applyUrl || '',
 });
 
 export const normalizeJobs = (list) => (Array.isArray(list) ? list.map(normalizeJob) : []);

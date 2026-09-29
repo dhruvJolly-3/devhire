@@ -4,8 +4,8 @@ export const tk = (dark) => ({
   surface: dark ? '#141417' : '#FFFEFB',
   surf2:   dark ? '#1A1A1E' : '#F7F5F0',   // secondary surface, hover bg
   t1:      dark ? '#F2F1ED' : '#18181B',
-  t2:      dark ? '#96948E' : '#6B6965',
-  t3:      dark ? '#5E5C56' : '#A09D94',
+  t2:      dark ? '#A8A69F' : '#5C5A55',
+  t3:      dark ? '#8A877F' : '#75726A',   // ≥4.5:1 on bg in both themes
   border:  dark ? '#27272B' : '#E8E4DA',
   accent:  dark ? '#7C6CFF' : '#5B4FF5',
   lime:    '#CDEB4A',

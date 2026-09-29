@@ -1,220 +1,167 @@
 import { useMemo, useRef, useState } from 'react';
 import { tk, MONO, SANS, SERIF } from '../theme';
-import FloatingPills from '../components/FloatingPills';
-import MascotHero from '../components/MascotHero';
-import BentoStrip from '../components/BentoStrip';
-import CompaniesMarquee from '../components/CompaniesMarquee';
-import FilterRow, { FilterPill } from '../components/FilterRow';
-import JobCarousel from '../components/JobCarousel';
+import JobCard from '../components/JobCard';
+import Pagination from '../components/Pagination';
+import JobFilters from '../components/JobFilters';
+import { EMPTY_FILTERS, matchesFilters, activeFilterCount } from '../utils/filters';
 
-const PAGE_STEP = 8;
+const PAGE_SIZE = 10;
+const SORTS = ['Newest', 'Oldest', 'Company A–Z'];
 
-export default function HomePage({ dark, onJobClick, mobile, jobs, loading, error, onRetry }) {
+// The job board: search, filter sidebar, sorted results, numbered pages.
+export default function HomePage({ dark, mobile, jobs, loading, error, onRetry, initialQuery = '',
+  onJobClick, savedIds, appliedIds, onToggleSave }) {
   const t = tk(dark);
-  const [searchValue, setSearchValue] = useState('');
-  const [searchFocused, setSearchFocused] = useState(false);
-  const [activeFilter, setActiveFilter] = useState('All');
-  const [stacks, setStacks] = useState([]);
-  const [sort, setSort] = useState('Newest');
-  const [limit, setLimit] = useState(PAGE_STEP);
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const [mousePos, setMousePos] = useState({ x:50, y:50 });
-  const heroRef = useRef(null);
   const accent = t.accent;
+  const [query, setQuery] = useState(initialQuery);
+  const [filters, setFiltersRaw] = useState(EMPTY_FILTERS);
+  const [sort, setSort] = useState('Newest');
+  const [page, setPage] = useState(1);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const resultsRef = useRef(null);
 
-  const handleMouseMove = (e) => {
-    if (!heroRef.current || mobile) return;
-    const r = heroRef.current.getBoundingClientRect();
-    setMousePos({ x:((e.clientX - r.left) / r.width) * 100, y:((e.clientY - r.top) / r.height) * 100 });
+  // Any change to what's being searched starts again from page 1.
+  const setFilters = (next) => { setFiltersRaw(next); setPage(1); };
+  const clearAll = () => { setFiltersRaw(EMPTY_FILTERS); setQuery(''); setPage(1); };
+
+  const cityCounts = useMemo(() => jobs.reduce((acc, j) => {
+    acc[j.city] = (acc[j.city] || 0) + 1;
+    return acc;
+  }, {}), [jobs]);
+
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const out = jobs.filter(j => matchesFilters(j, filters) &&
+      (!q || [j.title, j.company, j.location, j.city, ...j.tags].join(' ').toLowerCase().includes(q)));
+    const time = (j) => new Date(j.createdAt || 0).getTime();
+    if (sort === 'Newest') out.sort((a, b) => time(b) - time(a));
+    if (sort === 'Oldest') out.sort((a, b) => time(a) - time(b));
+    if (sort === 'Company A–Z') out.sort((a, b) => a.company.localeCompare(b.company));
+    return out;
+  }, [jobs, filters, query, sort]);
+
+  const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
+  const current = Math.min(page, totalPages);
+  const shown = results.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+  const from = results.length ? (current - 1) * PAGE_SIZE + 1 : 0;
+  const to = Math.min(current * PAGE_SIZE, results.length);
+  const nActive = activeFilterCount(filters);
+
+  const goToPage = (p) => {
+    setPage(p);
+    const top = (resultsRef.current?.getBoundingClientRect().top || 0) + window.scrollY - 90;
+    window.scrollTo({ top, behavior: 'smooth' });
   };
 
-  const stackOptions = useMemo(
-    () => [...new Set(jobs.flatMap(j => j.tags))].sort(),
-    [jobs],
-  );
-  const companies = useMemo(() => [...new Set(jobs.map(j => j.company))], [jobs]);
-  const cities = useMemo(() => new Set(jobs.map(j => j.location)).size, [jobs]);
-
-  const filteredJobs = useMemo(() => {
-    const q = searchValue.trim().toLowerCase();
-    let out = jobs.filter(j => {
-      if (activeFilter !== 'All' && j.type !== activeFilter) return false;
-      if (stacks.length && !stacks.some(s => j.tags.includes(s))) return false;
-      if (!q) return true;
-      return [j.title, j.company, j.location, ...j.tags].join(' ').toLowerCase().includes(q);
-    });
-    out = [...out];
-    if (sort === 'Newest')       out.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-    if (sort === 'Oldest')       out.sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
-    if (sort === 'Company A–Z')  out.sort((a, b) => a.company.localeCompare(b.company));
-    return out;
-  }, [jobs, activeFilter, stacks, searchValue, sort]);
-
-  const shown = filteredJobs.slice(0, limit);
-  const px = mobile ? 16 : 32;
+  const filters$ = <JobFilters dark={dark} filters={filters} setFilters={fn => setFilters(fn(filters))} cityCounts={cityCounts}/>;
 
   return (
     <div style={{ minHeight:'100vh', background:t.bg }}>
-      {/* ── Hero ───────────────────────────────────────────────────────── */}
-      <div ref={heroRef} onMouseMove={handleMouseMove}
-        style={{ minHeight:mobile?'60vh':'70vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', textAlign:'center', padding:mobile?'110px 24px 56px':'100px 32px 60px', position:'relative', overflow:'hidden' }}>
+      {/* ── Header + search ──────────────────────────────────────────── */}
+      <div style={{ maxWidth:1200, margin:'0 auto', padding:mobile?'96px 16px 8px':'116px 32px 12px' }}>
+        <div style={{ fontFamily:MONO, fontSize:11, color:t.t3, letterSpacing:'0.12em', marginBottom:10 }}>JOB BOARD</div>
+        <h1 style={{ fontFamily:SERIF, fontSize:mobile?36:52, fontWeight:400, lineHeight:1.02, color:t.t1, margin:'0 0 22px', letterSpacing:'-0.025em' }}>
+          Open <em style={{ color:accent, fontStyle:'italic' }}>roles</em>
+        </h1>
 
-        <div className="hero-glow" style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:800, height:800, background:`radial-gradient(circle,${accent}0A 0%,transparent 60%)`, pointerEvents:'none', zIndex:0 }}/>
-
-        {!mobile && (
-          <div style={{ position:'absolute', left:`${mousePos.x}%`, top:`${mousePos.y}%`, transform:'translate(-50%,-50%)', width:460, height:460, background:`radial-gradient(circle,${accent}07 0%,transparent 65%)`, pointerEvents:'none', transition:'left 500ms ease,top 500ms ease', zIndex:0 }}/>
-        )}
-
-        <FloatingPills dark={dark} mobile={mobile}/>
-        {!mobile && <MascotHero dark={dark}/>}
-
-        <div style={{ position:'relative', zIndex:1, maxWidth:720, margin:'0 auto' }}>
-          <div style={{ marginBottom:28 }}>
-            <span style={{ display:'inline-flex', alignItems:'center', gap:7, background:t.lime, color:'#18181B', fontFamily:MONO, fontSize:12, fontWeight:600, padding:'6px 16px', borderRadius:999, letterSpacing:'0.01em' }}>
-              ⌁ &nbsp;AI matching — launching soon
-            </span>
-          </div>
-
-          <h1 style={{ fontFamily:SERIF, fontSize:mobile?40:68, fontWeight:400, lineHeight:1.03, color:t.t1, margin:'0 0 22px', letterSpacing:'-0.025em' }}>
-            Find your next role,{' '}
-            <em style={{ color:accent, fontStyle:'italic' }}>fast.</em>
-          </h1>
-
-          <p style={{ fontFamily:SANS, fontSize:mobile?16:18, fontWeight:500, color:t.t1, maxWidth:500, margin:'0 auto 36px', lineHeight:1.68, position:'relative', textShadow:`0 0 2px ${dark?'#0D0D10':'#FAF8F3'},0 0 10px ${dark?'#0D0D10':'#FAF8F3'},0 0 22px ${dark?'#0D0D10':'#FAF8F3'}` }}>
-            Curated developer jobs at Indian startups. No recruiters, no spam, no consultancy gigs.
-          </p>
-
-          {/* Search */}
-          <div style={{ position:'relative', width:mobile?'100%':680, margin:'0 auto 16px' }}>
-            <div style={{
-              border:`1.5px solid ${searchFocused ? accent : searchValue ? accent+'99' : t.border}`,
-              borderRadius:14, overflow:'hidden',
-              boxShadow: searchFocused
-                ? `0 0 0 3.5px ${t.lime}45, 0 4px 20px ${accent}15`
-                : searchValue ? `0 0 0 2px ${accent}20, 0 4px 16px ${accent}10` : 'none',
-              transition:'border-color 200ms, box-shadow 250ms, background 300ms',
-              background: searchValue ? (dark ? 'rgba(124,108,255,0.10)' : 'rgba(91,79,245,0.05)') : t.surface,
-              position:'relative',
-            }}>
-              <input value={searchValue} onChange={e => { setSearchValue(e.target.value); setLimit(PAGE_STEP); }}
-                onFocus={() => setSearchFocused(true)} onBlur={() => setSearchFocused(false)}
-                placeholder="search roles, companies, stack…"
-                style={{ width:'100%', height:58, border:'none', outline:'none', background:'transparent',
-                  padding:`0 ${searchValue ? '130px' : '110px'} 0 22px`,
-                  fontFamily:MONO, fontSize:13, color:t.t1, boxSizing:'border-box', transition:'padding 150ms' }}/>
-              <div style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', display:'flex', alignItems:'center', gap:8 }}>
-                {!searchValue && (
-                  <span style={{ fontFamily:MONO, fontSize:11, color:t.t3, background:t.tagBg, border:`1px solid ${t.border}`, borderRadius:6, padding:'3px 9px', letterSpacing:'0.02em' }}>⌘K</span>
-                )}
-                {searchValue && (
-                  <button onClick={() => setSearchValue('')}
-                    onMouseEnter={e => { e.currentTarget.style.filter='brightness(1.1)'; e.currentTarget.style.transform='scale(1.03)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.filter=''; e.currentTarget.style.transform=''; }}
-                    style={{ background:accent, border:'none', borderRadius:10, padding:'0 16px', height:40, cursor:'pointer', fontFamily:MONO, fontSize:12, fontWeight:600, color:'#fff', display:'flex', alignItems:'center', gap:6, transition:'filter 150ms, transform 150ms', whiteSpace:'nowrap' }}>
-                    Clear ×
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Quick tags */}
-          <div style={{ display:'flex', gap:8, justifyContent:'center', flexWrap:'wrap' }}>
-            {['React','Node.js','AI/ML'].map(tag => (
-              <button key={tag} onClick={() => { setSearchValue(tag); setLimit(PAGE_STEP); }}
-                style={{ fontFamily:MONO, fontSize:12, color:t.t3, background:'none', border:`1px solid ${t.border}`, borderRadius:99, padding:'5px 13px', cursor:'pointer', transition:'all 160ms' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = accent; e.currentTarget.style.color = accent; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = t.border; e.currentTarget.style.color = t.t3; }}>
-                {tag}
-              </button>
-            ))}
-          </div>
+        <div style={{ position:'relative' }}>
+          <input value={query} onChange={e => { setQuery(e.target.value); setPage(1); }}
+            aria-label="Search jobs" placeholder="Search by role, company, skill or city…"
+            style={{ width:'100%', height:56, borderRadius:14, border:`1.5px solid ${query ? accent + '99' : t.border}`, background:t.surface,
+              padding:'0 110px 0 22px', fontFamily:MONO, fontSize:13, color:t.t1, outline:'none', boxSizing:'border-box', transition:'border-color 200ms' }}
+            onFocus={e => { e.currentTarget.style.borderColor = accent; }}
+            onBlur={e => { e.currentTarget.style.borderColor = query ? accent + '99' : t.border; }}/>
+          {query && (
+            <button onClick={() => { setQuery(''); setPage(1); }}
+              style={{ position:'absolute', right:8, top:'50%', transform:'translateY(-50%)', background:accent, border:'none', borderRadius:10, padding:'0 16px', height:40, cursor:'pointer', fontFamily:MONO, fontSize:12, fontWeight:600, color:'#fff' }}>
+              Clear ×
+            </button>
+          )}
         </div>
       </div>
 
-      {/* ── Bento ──────────────────────────────────────────────────────── */}
-      <div style={{ maxWidth:1200, margin:'0 auto', padding:`0 ${px}px 0` }}>
-        <BentoStrip dark={dark} mobile={mobile} jobs={jobs} companyCount={companies.length} cityCount={cities}/>
-      </div>
+      {/* ── Sidebar + results ────────────────────────────────────────── */}
+      <div ref={resultsRef} style={{ maxWidth:1200, margin:'0 auto', padding:mobile?'16px 16px 100px':'24px 32px 110px',
+        display:'grid', gridTemplateColumns:mobile ? '1fr' : '240px 1fr', gap:mobile ? 16 : 40, alignItems:'start' }}>
 
-      {/* ── Marquee ────────────────────────────────────────────────────── */}
-      <div style={{ maxWidth:'100%', marginTop:40 }}>
-        <CompaniesMarquee dark={dark} companies={companies}/>
-      </div>
-
-      {/* ── Filters ────────────────────────────────────────────────────── */}
-      <FilterRow dark={dark} mobile={mobile}
-        activeFilter={activeFilter} setActiveFilter={f => { setActiveFilter(f); setLimit(PAGE_STEP); }}
-        stacks={stacks} setStacks={s => { setStacks(s); setLimit(PAGE_STEP); }} stackOptions={stackOptions}
-        sort={sort} setSort={setSort} count={filteredJobs.length}
-        onMobileFilterTap={() => setShowMobileFilters(true)}/>
-
-      {/* ── Job list ───────────────────────────────────────────────────── */}
-      <div style={{ maxWidth:1200, margin:'0 auto', padding:`32px ${px}px 100px` }}>
-        {loading && (
-          <div style={{ borderRadius:14, border:`1px dashed ${t.border}`, padding:'56px 24px', textAlign:'center' }}>
-            <span style={{ fontFamily:MONO, fontSize:13, color:t.t3 }}>fetching jobs…</span>
-          </div>
-        )}
-
-        {!loading && error && (
-          <div style={{ borderRadius:14, border:`1px solid ${t.border}`, background:t.surface, padding:'40px 24px', textAlign:'center' }}>
-            <p style={{ fontFamily:MONO, fontSize:13, color:t.t2, margin:'0 0 16px' }}>{error}</p>
-            <button onClick={onRetry}
-              style={{ fontFamily:MONO, fontSize:12, color:'#fff', background:accent, border:'none', borderRadius:8, padding:'10px 20px', cursor:'pointer' }}>
-              Retry
-            </button>
-          </div>
-        )}
-
-        {!loading && !error && (
-          <>
-            <JobCarousel jobs={shown} dark={dark} onJobClick={onJobClick} mobile={mobile}/>
-            {filteredJobs.length > limit && (
-              <div style={{ textAlign:'center', marginTop:44 }}>
-                <button onClick={() => setLimit(l => l + PAGE_STEP)}
-                  style={{ fontFamily:MONO, fontSize:13, color:t.t2, background:'none', border:`1px solid ${t.border}`, borderRadius:8, padding:'12px 32px', cursor:'pointer', transition:'all 160ms' }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = t.t1; e.currentTarget.style.color = t.t1; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = t.border; e.currentTarget.style.color = t.t2; }}>
-                  Load more jobs ↓
+        {!mobile && (
+          <aside style={{ position:'sticky', top:88, maxHeight:'calc(100vh - 110px)', overflowY:'auto', paddingRight:14, scrollbarGutter:'stable' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom:18 }}>
+              <span style={{ fontFamily:SANS, fontSize:15, fontWeight:600, color:t.t1 }}>Filters</span>
+              {nActive > 0 && (
+                <button onClick={() => setFilters(EMPTY_FILTERS)} style={{ background:'none', border:'none', fontFamily:MONO, fontSize:12, color:accent, cursor:'pointer', padding:0 }}>
+                  Clear ({nActive})
                 </button>
-              </div>
-            )}
-          </>
+              )}
+            </div>
+            {filters$}
+          </aside>
         )}
-      </div>
 
-      {/* ── Mobile filter sheet ────────────────────────────────────────── */}
-      {showMobileFilters && (
-        <div style={{ position:'fixed', inset:0, zIndex:80, background:'rgba(0,0,0,0.45)', display:'flex', alignItems:'flex-end' }} onClick={() => setShowMobileFilters(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ width:'100%', background:t.surface, borderRadius:'20px 20px 0 0', padding:24, maxHeight:'80vh', overflowY:'auto' }}>
-            <div style={{ width:40, height:4, background:t.border, borderRadius:99, margin:'0 auto 24px' }}/>
-            <p style={{ fontFamily:MONO, fontSize:11, color:t.t3, letterSpacing:'0.08em', marginBottom:12 }}>TYPE</p>
-            <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:24 }}>
-              {['All','Remote','Onsite','Hybrid'].map(f => (
-                <FilterPill key={f} label={f} active={activeFilter === f} t={t} onClick={() => { setActiveFilter(f); setLimit(PAGE_STEP); }}/>
+        <main>
+          {/* Toolbar */}
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, marginBottom:16, flexWrap:'wrap' }}>
+            <span aria-live="polite" style={{ fontFamily:MONO, fontSize:12, color:t.t2 }}>
+              {loading ? 'Loading jobs…' : results.length ? `Showing ${from}–${to} of ${results.length} jobs` : 'No jobs found'}
+            </span>
+            <div style={{ display:'flex', gap:8 }}>
+              {mobile && (
+                <button onClick={() => setSheetOpen(true)}
+                  style={{ height:38, padding:'0 14px', borderRadius:10, border:`1px solid ${nActive ? accent : t.border}`, background:t.surface, fontFamily:SANS, fontSize:13, color:t.t1, cursor:'pointer' }}>
+                  Filters{nActive ? ` (${nActive})` : ''}
+                </button>
+              )}
+              <select value={sort} onChange={e => { setSort(e.target.value); setPage(1); }} aria-label="Sort jobs"
+                style={{ height:38, padding:'0 12px', borderRadius:10, border:`1px solid ${t.border}`, background:t.surface, fontFamily:SANS, fontSize:13, color:t.t1, cursor:'pointer' }}>
+                {SORTS.map(s => <option key={s} value={s}>{s === 'Newest' ? 'Sort: Newest' : s === 'Oldest' ? 'Sort: Oldest' : 'Sort: Company A–Z'}</option>)}
+              </select>
+            </div>
+          </div>
+
+          {loading && Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="skeleton" style={{ height:96, borderRadius:14, border:`1px solid ${t.border}`, background:t.surface, marginBottom:12 }}/>
+          ))}
+
+          {!loading && error && (
+            <div style={{ borderRadius:14, border:`1px solid ${t.border}`, background:t.surface, padding:'40px 24px', textAlign:'center' }}>
+              <p style={{ fontFamily:MONO, fontSize:13, color:t.t2, margin:'0 0 16px' }}>{error}</p>
+              <button onClick={onRetry} style={{ fontFamily:MONO, fontSize:12, color:'#fff', background:accent, border:'none', borderRadius:8, padding:'10px 20px', cursor:'pointer' }}>Retry</button>
+            </div>
+          )}
+
+          {!loading && !error && results.length === 0 && (
+            <div style={{ borderRadius:14, border:`1px dashed ${t.border}`, padding:'56px 24px', textAlign:'center' }}>
+              <p style={{ fontFamily:SANS, fontSize:16, color:t.t1, margin:'0 0 6px' }}>No jobs match your search.</p>
+              <p style={{ fontFamily:SANS, fontSize:14, color:t.t2, margin:'0 0 18px' }}>Try fewer filters or a broader keyword.</p>
+              <button onClick={clearAll} style={{ fontFamily:MONO, fontSize:12, color:'#fff', background:accent, border:'none', borderRadius:8, padding:'10px 20px', cursor:'pointer' }}>Clear search & filters</button>
+            </div>
+          )}
+
+          {!loading && !error && results.length > 0 && (
+            <div key={`${current}|${sort}|${query}|${JSON.stringify(filters)}`} className="fade-swap" style={{ display:'flex', flexDirection:'column', gap:12 }}>
+              {shown.map((job, i) => (
+                <JobCard key={job.id} job={job} dark={dark} mobile={mobile} idx={i} onClick={onJobClick}
+                  saved={savedIds.has(job.id)} applied={appliedIds.has(job.id)} onToggleSave={onToggleSave}/>
               ))}
             </div>
-            {stackOptions.length > 0 && (
-              <>
-                <p style={{ fontFamily:MONO, fontSize:11, color:t.t3, letterSpacing:'0.08em', marginBottom:12 }}>STACK</p>
-                <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:24 }}>
-                  {stackOptions.map(s => {
-                    const on = stacks.includes(s);
-                    return (
-                      <button key={s} onClick={() => { setStacks(on ? stacks.filter(x => x !== s) : [...stacks, s]); setLimit(PAGE_STEP); }}
-                        style={{ fontFamily:MONO, fontSize:11, color:on?'#fff':t.t2, background:on?accent:t.tagBg, border:'none', borderRadius:6, padding:'7px 10px', cursor:'pointer' }}>
-                        {s}
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-            <button onClick={() => setShowMobileFilters(false)}
-              style={{ width:'100%', padding:16, background:accent, border:'none', borderRadius:12, fontFamily:SANS, fontSize:16, fontWeight:600, color:'#fff', cursor:'pointer' }}>
-              Apply filters
-            </button>
+          )}
+
+          <Pagination dark={dark} page={current} total={totalPages} onChange={goToPage}/>
+        </main>
+      </div>
+
+      {/* ── Mobile filter sheet ──────────────────────────────────────── */}
+      {mobile && sheetOpen && (
+        <div style={{ position:'fixed', inset:0, zIndex:80, background:'rgba(0,0,0,0.45)', display:'flex', alignItems:'flex-end' }} onClick={() => setSheetOpen(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ width:'100%', background:t.surface, borderRadius:'20px 20px 0 0', padding:24, maxHeight:'85vh', overflowY:'auto' }}>
+            <div style={{ width:40, height:4, background:t.border, borderRadius:99, margin:'0 auto 20px' }}/>
+            {filters$}
+            <div style={{ display:'flex', gap:10, marginTop:24 }}>
+              <button onClick={() => setFilters(EMPTY_FILTERS)} style={{ flex:1, padding:14, background:'none', border:`1px solid ${t.border}`, borderRadius:12, fontFamily:SANS, fontSize:15, color:t.t1, cursor:'pointer' }}>Clear</button>
+              <button onClick={() => setSheetOpen(false)} style={{ flex:2, padding:14, background:accent, border:'none', borderRadius:12, fontFamily:SANS, fontSize:15, fontWeight:600, color:'#fff', cursor:'pointer' }}>
+                Show {results.length} jobs
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { tk, MONO, SANS } from '../theme';
+import { logoDomain, logoSources } from '../utils/logo';
 
 // ─── Wordmark ──────────────────────────────────────────────────────────────
 export const Wordmark = ({ dark, onClick }) => {
@@ -53,13 +54,23 @@ export const FooterLink = ({ label, t }) => {
 };
 
 // ─── Company marks ─────────────────────────────────────────────────────────
-// A job with no `domain` skips the favicon fetch entirely and renders the
-// colour swatch / initials fallback.
+// Tries each logo source in turn (see utils/logo.js); when all fail, or the
+// company is unknown, renders the colour swatch / initials fallback.
+const useLogo = (job, size) => {
+  const sources = logoSources(logoDomain(job), size);
+  const key = sources.join('|');
+  const [state, setState] = useState({ key, idx: 0 });
+  const idx = state.key === key ? state.idx : 0;
+  return {
+    src: sources[idx] || null,
+    onError: () => setState({ key, idx: idx + 1 }),
+  };
+};
+
 export const InlineIcon = ({ job, size = 16 }) => {
-  const [ok, setOk] = useState(Boolean(job.domain));
-  return ok ? (
-    <img src={`https://www.google.com/s2/favicons?domain=${job.domain}&sz=64`}
-      onError={() => setOk(false)}
+  const { src, onError } = useLogo(job, 64);
+  return src ? (
+    <img src={src} onError={onError}
       style={{ width:size, height:size, objectFit:'contain', borderRadius:3, flexShrink:0, verticalAlign:'middle' }}
       alt={job.company}/>
   ) : (
@@ -68,17 +79,17 @@ export const InlineIcon = ({ job, size = 16 }) => {
 };
 
 export const CompanyAvatar = ({ job, size = 40, dark = false }) => {
-  const [imgOk, setImgOk] = useState(Boolean(job.domain));
+  const { src, onError } = useLogo(job, 128);
   return (
     <div style={{
       width:size, height:size, borderRadius:'50%', flexShrink:0, overflow:'hidden', position:'relative',
-      background: imgOk ? '#fff' : job.color,
-      border: imgOk ? `1px solid ${dark ? '#2A2A2E' : '#EAE6DA'}` : 'none',
+      background: src ? '#fff' : job.color,
+      border: src ? `1px solid ${dark ? '#2A2A2E' : '#EAE6DA'}` : 'none',
       display:'flex', alignItems:'center', justifyContent:'center',
+      transition:'background 200ms',
     }}>
-      {imgOk ? (
-        <img src={`https://www.google.com/s2/favicons?domain=${job.domain}&sz=128`}
-          alt={job.company} onError={() => setImgOk(false)}
+      {src ? (
+        <img src={src} alt={job.company} onError={onError}
           style={{ width:'60%', height:'60%', objectFit:'contain', display:'block' }}/>
       ) : (
         <span style={{ fontFamily:MONO, fontSize:size*0.38, fontWeight:600, color:'#fff' }}>{job.initials}</span>
