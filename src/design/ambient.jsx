@@ -11,7 +11,7 @@ export function Marquee({ companies }) {
   return (
     <div style={{ display: 'flex', gap: 56, width: 'max-content', animation: 'dhMarquee 36s linear infinite' }}>
       {row.map((c, i) => (
-        <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 56, fontFamily: "'Geist Mono',monospace", fontSize: 13, color: '#75726A', whiteSpace: 'nowrap' }}>
+        <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 56, fontFamily: "'Geist Mono',monospace", fontSize: 13, color: 'var(--c-muted)', whiteSpace: 'nowrap' }}>
           {c}
           <span style={{ width: 5, height: 5, borderRadius: 2, background: i % 2 ? '#5B4FF5' : '#D2F53B' }}/>
         </span>
@@ -37,14 +37,14 @@ export function LiveDot() {
 
 export function Spinner() {
   return (
-  <span style={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid #E8E4DA', borderTopColor: '#5B4FF5', animation: 'dhSpin .8s linear infinite', display: 'inline-block', flexShrink: 0 }}/>
+  <span style={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid var(--c-line)', borderTopColor: '#5B4FF5', animation: 'dhSpin .8s linear infinite', display: 'inline-block', flexShrink: 0 }}/>
   );
 }
 
 export function MatchRing({ score }) {
   return (
-    <div style={{ '--dhDeg': score * 3.6 + 'deg', width: 88, height: 88, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'conic-gradient(#5B4FF5 var(--dhDeg), #E8E4DA 0)', animation: 'dhRing 1s cubic-bezier(.22,1,.36,1)' }}>
-      <div style={{ width: 70, height: 70, borderRadius: '50%', background: '#FAF8F3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Geist Mono',monospace", fontSize: 20, fontWeight: 500, animation: 'dhPop .5s .5s cubic-bezier(.34,1.56,.64,1) backwards' }}>
+    <div style={{ '--dhDeg': score * 3.6 + 'deg', width: 88, height: 88, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'conic-gradient(#5B4FF5 var(--dhDeg), var(--c-line) 0)', animation: 'dhRing 1s cubic-bezier(.22,1,.36,1)' }}>
+      <div style={{ width: 70, height: 70, borderRadius: '50%', background: 'var(--c-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Geist Mono',monospace", fontSize: 20, fontWeight: 500, animation: 'dhPop .5s .5s cubic-bezier(.34,1.56,.64,1) backwards' }}>
         {score}
       </div>
     </div>
@@ -53,7 +53,7 @@ export function MatchRing({ score }) {
 
 export function LetterBox({ text }) {
   return (
-    <div style={{ maxHeight: 260, overflow: 'auto', padding: 16, borderRadius: 10, background: '#FFFEFB', border: '1px solid #E8E4DA', fontSize: 14, lineHeight: 1.7, color: '#2A2721', whiteSpace: 'pre-wrap', animation: `dhType ${Math.min(3.5, text.length / 250)}s steps(${Math.max(8, Math.round(text.length / 60))}) both` }}>
+    <div style={{ maxHeight: 260, overflow: 'auto', padding: 16, borderRadius: 10, background: 'var(--c-paper)', border: '1px solid var(--c-line)', fontSize: 14, lineHeight: 1.7, color: 'var(--c-letter)', whiteSpace: 'pre-wrap', animation: `dhType ${Math.min(3.5, text.length / 250)}s steps(${Math.max(8, Math.round(text.length / 60))}) both` }}>
       {text}
     </div>
   );

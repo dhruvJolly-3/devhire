@@ -1,6 +1,7 @@
 /* App-wide basics. Page styles live inline in src/design; keyframes and hover
    states in src/design/design.css. */
-html { scroll-behavior: smooth; }
+/* Smooth scrolling comes from Lenis (hooks/usePageMotion.js); native smooth
+   scrolling would fight it. */
 /* No rubber-band overscroll past the page edges (macOS / iOS). */
 html, body { overscroll-behavior-y: none; }
 button:focus-visible, a:focus-visible { outline: 2px solid #5B4FF5; outline-offset: 2px; }

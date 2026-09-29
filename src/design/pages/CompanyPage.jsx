@@ -8,15 +8,15 @@ export default function CompanyPage({ v }) {
       {' '}
       <div data-screen-label="10 Company page">
         {' '}
-        <div style={{ position: "relative", overflow: "hidden", borderBottom: "1px solid #E8E4DA" }}>
+        <div style={{ position: "relative", overflow: "hidden", borderBottom: "1px solid var(--c-line)" }}>
           {' '}
-          <div aria-hidden="true" data-parallax="0.2" style={{ position: "absolute", inset: "-18% 0", background: "#F1E9DD url(\"/assets/company-banner.jpg\") right center/cover no-repeat", pointerEvents: "none", willChange: "transform" }}/>
+          <div aria-hidden="true" data-parallax="0.2" style={{ position: "absolute", inset: "-18% 0", background: "var(--c-sand2) url(\"/assets/company-banner.jpg\") right center/cover no-repeat", pointerEvents: "none", willChange: "transform" }}/>
           {' '}
-          <div aria-hidden="true" style={{ position: "absolute", inset: "0", background: "linear-gradient(90deg,rgba(250,248,243,0.96) 0%,rgba(250,248,243,0.9) 55%,rgba(250,248,243,0) 85%)", pointerEvents: "none" }}/>
+          <div aria-hidden="true" style={{ position: "absolute", inset: "0", background: "linear-gradient(90deg,rgba(var(--c-bg-rgb),0.96) 0%,rgba(var(--c-bg-rgb),0.9) 55%,rgba(var(--c-bg-rgb),0) 85%)", pointerEvents: "none" }}/>
           {' '}
           <div style={{ position: "relative", maxWidth: "1200px", margin: "0 auto", padding: "40px 32px 64px", display: "flex", flexDirection: "column", gap: "32px" }}>
             {' '}
-            <button onClick={v.goHome} style={{ alignSelf: "flex-start", background: "none", border: "none", padding: "0", fontFamily: "'Geist Mono',monospace", fontSize: "13px", color: "#75726A", cursor: "pointer" }} className="dh58">
+            <button onClick={v.goHome} style={{ alignSelf: "flex-start", background: "none", border: "none", padding: "0", fontFamily: "'Geist Mono',monospace", fontSize: "13px", color: "var(--c-muted)", cursor: "pointer" }} className="dh58">
               ← all jobs
             </button>
             {' '}
@@ -26,9 +26,9 @@ export default function CompanyPage({ v }) {
                 {' '}
                 <div aria-hidden="true" style={{ position: "absolute", inset: "0", borderRadius: "24px", border: "1.5px dashed #5B4FF5", transform: "rotate(8deg) translate(6px,2px)" }}/>
                 {' '}
-                <div aria-hidden="true" style={{ position: "absolute", inset: "0", borderRadius: "24px", background: "#18181B", transform: "translate(6px,6px)" }}/>
+                <div aria-hidden="true" style={{ position: "absolute", inset: "0", borderRadius: "24px", background: "var(--c-ink)", transform: "translate(6px,6px)" }}/>
                 {' '}
-                <div style={{ position: "absolute", inset: "0", borderRadius: "24px", background: v.co.avBg, color: v.co.avFg, border: "1.5px solid #18181B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "36px", fontWeight: "600", letterSpacing: "-0.02em" }}>
+                <div style={{ position: "absolute", inset: "0", borderRadius: "24px", background: v.co.avBg, color: v.co.avFg, border: "1.5px solid var(--c-ink)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "36px", fontWeight: "600", letterSpacing: "-0.02em" }}>
                   {v.co.initials}
                 </div>
                 {' '}
@@ -42,13 +42,13 @@ export default function CompanyPage({ v }) {
                     {v.co.industry}
                   </span>
                   {' '}
-                  <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "5px 10px", borderRadius: "6px", background: "#F1EEE5", color: "#3F3D38" }}>
+                  <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "5px 10px", borderRadius: "6px", background: "var(--c-sunk)", color: "var(--c-text2)" }}>
                     {v.co.hq}
                   </span>
                   {' '}
                   {v.hasDomain ? (
                     <>
-                      <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "5px 10px", borderRadius: "6px", background: "#F1EEE5", color: "#3F3D38" }}>
+                      <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "5px 10px", borderRadius: "6px", background: "var(--c-sunk)", color: "var(--c-text2)" }}>
                         {v.co.domain}
                       </span>
                     </>
@@ -60,7 +60,7 @@ export default function CompanyPage({ v }) {
                   {v.co.name}
                 </h1>
                 {' '}
-                <p style={{ margin: "0", fontSize: "18px", lineHeight: "1.6", color: "#3F3D38", maxWidth: "620px", textWrap: "pretty" }}>
+                <p style={{ margin: "0", fontSize: "18px", lineHeight: "1.6", color: "var(--c-text2)", maxWidth: "620px", textWrap: "pretty" }}>
                   {v.co.about}
                 </p>
                 {' '}
@@ -76,7 +76,7 @@ export default function CompanyPage({ v }) {
           {' '}
           <div data-rise="1" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {' '}
-            <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "#5B4FF5", letterSpacing: "0.08em" }}>
+            <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "var(--c-accent-text)", letterSpacing: "0.08em" }}>
               / HIRING NOW
             </span>
             {' '}
@@ -93,13 +93,13 @@ export default function CompanyPage({ v }) {
             {(v.coJobs || []).map((j, i0) => (
               <Fragment key={j?.id ?? i0}>
                 {' '}
-                <article onClick={j.onOpen} style={{ cursor: "pointer", background: "#FFFEFB", border: "1.5px solid #E8E4DA", borderRadius: "14px", padding: "24px", display: "flex", gap: "20px", alignItems: "center", flexWrap: "wrap", transition: "transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,border-color .25s" }} className="dh59">
+                <article onClick={j.onOpen} style={{ cursor: "pointer", background: "var(--c-paper)", border: "1.5px solid var(--c-line)", borderRadius: "14px", padding: "24px", display: "flex", gap: "20px", alignItems: "center", flexWrap: "wrap", transition: "transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,border-color .25s" }} className="dh59">
                   {' '}
                   <div style={{ flex: "1 1 280px", minWidth: "0", display: "flex", flexDirection: "column", gap: "10px" }}>
                     {' '}
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                       {' '}
-                      <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "#75726A" }}>
+                      <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "var(--c-muted)" }}>
                         {j.posted}
                       </span>
                       {' '}
@@ -119,14 +119,14 @@ export default function CompanyPage({ v }) {
                     {' '}
                     <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                       {' '}
-                      <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "4px 9px", borderRadius: "6px", background: "#EEEBFF", color: "#4438D9" }}>
+                      <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "4px 9px", borderRadius: "6px", background: "var(--c-tint)", color: "var(--c-accent-ink)" }}>
                         {j.type}
                       </span>
                       {' '}
                       {(j.tags || []).map((t, i1) => (
                         <Fragment key={t?.id ?? i1}>
                           {' '}
-                          <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "4px 9px", borderRadius: "6px", background: "#F1EEE5", color: "#3F3D38" }}>
+                          <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "4px 9px", borderRadius: "6px", background: "var(--c-sunk)", color: "var(--c-text2)" }}>
                             {t}
                           </span>
                           {' '}
@@ -143,7 +143,7 @@ export default function CompanyPage({ v }) {
                       {j.salary}
                     </span>
                     {' '}
-                    <span style={{ fontSize: "13px", color: "#75726A" }}>
+                    <span style={{ fontSize: "13px", color: "var(--c-muted)" }}>
                       {j.location} ·{' '}
                       <span style={{ fontFamily: "'Geist Mono',monospace" }}>
                         {j.exp}
@@ -166,7 +166,7 @@ export default function CompanyPage({ v }) {
           {v.coEmpty ? (
             <>
               {' '}
-              <div style={{ borderRadius: "14px", border: "1.5px dashed #D5D0C4", padding: "56px 24px", textAlign: "center", fontSize: "15px", color: "#5C5A55" }}>
+              <div style={{ borderRadius: "14px", border: "1.5px dashed var(--c-line2)", padding: "56px 24px", textAlign: "center", fontSize: "15px", color: "var(--c-text3)" }}>
                 No open roles right now.
               </div>
               {' '}

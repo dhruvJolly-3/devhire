@@ -11,12 +11,14 @@ import ProfilePage from './design/pages/ProfilePage';
 import PostJobPage from './design/pages/PostJobPage';
 import DashboardPage from './design/pages/DashboardPage';
 import CompanyPage from './design/pages/CompanyPage';
+import { NavTools, CommandPalette, Toasts, BackToTop, SkeletonList, TopLoader } from './design/extras';
 import { Marquee, Shimmer, LiveDot, Spinner, MatchRing, LetterBox, BgVideo } from './design/ambient';
 import useJobs from './hooks/useJobs';
 import useMyJobs from './hooks/useMyJobs';
 import useProfile from './hooks/useProfile';
 import useEmployer from './hooks/useEmployer';
 import usePageMotion from './hooks/usePageMotion';
+import useTheme from './hooks/useTheme';
 import { normalizeJob } from './utils/job';
 import { parseHash, resolveRoute, go, replace, jobPath, loginPath } from './utils/routes';
 import {
@@ -50,7 +52,8 @@ export default function App() {
   const route = resolveRoute(location, user);
   const page = route.page;
 
-  const { jobs, reload: reloadJobs } = useJobs();
+  const { jobs, loading: jobsLoading, reload: reloadJobs } = useJobs();
+  const theme = useTheme();
   const my = useMyJobs(user);
   const { profile, save: saveProfileApi, uploadResume } = useProfile(user);
   const emp = useEmployer(user, !!user);
@@ -98,6 +101,30 @@ export default function App() {
   const [company, setCompany] = useState({ name: null, data: null });
 
   const motion = usePageMotion(setLocation);
+
+  // Toasts: short confirmations at the bottom of the screen.
+  const [toasts, setToasts] = useState([]);
+  const toast = useCallback((text, icon) => {
+    const id = Date.now() + Math.random();
+    setToasts(t => [...t.slice(-2), { id, text, icon }]);
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 2600);
+  }, []);
+
+  // Command palette: ⌘K / Ctrl+K anywhere, or "/" when not typing.
+  const [cmdOpen, setCmdOpen] = useState(false);
+  const [cmdQuery, setCmdQuery] = useState('');
+  useEffect(() => {
+    const onKey = (e) => {
+      const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || '');
+      if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || (e.key === '/' && !typing)) {
+        e.preventDefault();
+        setCmdQuery('');
+        setCmdOpen(o => !o);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   // Redirect-only routes (e.g. #/ when signed in → #/jobs).
   useEffect(() => { if (route.redirect) replace(route.redirect); }, [route.redirect]);
@@ -148,6 +175,7 @@ export default function App() {
     e?.stopPropagation?.();
     if (!requireAuth(here())) return;
     e?.currentTarget?.animate?.([{ transform: 'scale(1)' }, { transform: 'scale(1.35) rotate(-8deg)' }, { transform: 'scale(1)' }], { duration: 360, easing: 'cubic-bezier(.34,1.56,.64,1)' });
+    toast(my.savedIds.has(job.id) ? 'Removed from saved jobs' : `Saved ${job.title}`, my.savedIds.has(job.id) ? '☆' : '★');
     my.toggleSave(job);
   };
 
@@ -169,6 +197,7 @@ export default function App() {
       setAuthForm(EMPTY_AUTH);
       setAuthError('');
       setUser(res.data.user);
+      toast(`Welcome${isReg ? '' : ' back'}, ${res.data.user.name.split(' ')[0]}`, '👋');
       replace(route.next || '/jobs');
     } catch (err) {
       setAuthError(errMsg(err, 'Could not reach the server. Is the backend running?'));
@@ -183,6 +212,7 @@ export default function App() {
     setUser(null);
     setAi({});
     setPfDraft(null);
+    toast('Signed out', '→');
     go('/login');
   };
 
@@ -198,7 +228,7 @@ export default function App() {
       posted: ago(days), isNew: days < 1, initials: j.company.slice(0, 2), avBg, avFg, via: j.sourceLabel || '',
       applied: isApplied, appliedWhen: isApplied ? ago(daysSince(appliedAt[j.id])) : '',
       saveIcon: saved ? '★' : '☆', saveLong: saved ? '★ Saved' : '☆ Save for later', saveShort: saved ? '★ Saved' : '☆ Save',
-      saveBg: saved ? '#EEEBFF' : '#FFFEFB', saveFg: saved ? '#5B4FF5' : '#5C5A55', saveBorder: saved ? '#5B4FF5' : '#E8E4DA',
+      saveBg: saved ? 'var(--c-tint)' : 'var(--c-paper)', saveFg: saved ? 'var(--c-accent-text)' : 'var(--c-text3)', saveBorder: saved ? '#5B4FF5' : 'var(--c-line)',
       onOpen: () => go(jobPath(j)), onSave: (e) => toggleSave(j, e),
       onCompany: (e) => { e?.stopPropagation?.(); go(`/company/${encodeURIComponent(j.company)}`); },
     };
@@ -262,6 +292,7 @@ export default function App() {
     // Open the tab first — browsers block popups opened after an await.
     if (dj0.applyUrl) window.open(dj0.applyUrl, '_blank', 'noopener,noreferrer');
     my.markApplied(dj0);
+    toast(dj0.applyUrl ? 'Marked as applied — finish on the company site' : `Applied to ${dj0.company}`, '✓');
   };
 
   // ── Profile ──────────────────────────────────────────────────────────────
@@ -281,6 +312,7 @@ export default function App() {
       setPfDraft(null);
       setPfErr(false);
       setPfMsg('✓ Profile saved');
+      toast('Profile saved');
     } catch (err) {
       setPfErr(true);
       setPfMsg(errMsg(err, 'Could not save your profile.'));
@@ -327,7 +359,7 @@ export default function App() {
     if (!requireAuth(route.editId ? `/post/${route.editId}` : '/post')) return;
     if (!post.title.trim() || !post.company.trim() || !post.description.trim()) {
       form.animate?.([{ transform: 'translateX(0)' }, { transform: 'translateX(-8px)' }, { transform: 'translateX(8px)' }, { transform: 'translateX(0)' }], { duration: 320 });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      (window.__lenis ? window.__lenis.scrollTo(0) : window.scrollTo({ top: 0, behavior: 'smooth' }));
       setPostDone(null);
       return setPostError('Role title, company and description are required.');
     }
@@ -342,12 +374,14 @@ export default function App() {
         setPostDraft({ key: null, form: EMPTY_POST });
         setDashSel(route.editId);
         setDashMsg(`✓ Saved changes to ${body.title}`);
+        toast('Changes saved');
         go('/dashboard');
       } else {
         const res = await api.post('/jobs', body);
         setPostDraft({ key: postKey, form: EMPTY_POST });
         setPostDone(res.data._id);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        toast('Your role is live on the board', '🚀');
+        (window.__lenis ? window.__lenis.scrollTo(0) : window.scrollTo({ top: 0, behavior: 'smooth' }));
       }
       setPostError('');
       reloadJobs();
@@ -370,6 +404,7 @@ export default function App() {
     try {
       await emp.remove(id);
       setDashMsg(`${title} deleted.`);
+      toast(`${title} deleted`, '🗑');
       reloadJobs();
     } catch (err) {
       setDashMsg(errMsg(err, 'Could not delete that listing.'));
@@ -385,7 +420,7 @@ export default function App() {
 
   // ── Auth ─────────────────────────────────────────────────────────────────
   const nextJob = route.next?.startsWith('/jobs/') ? jobs.find(j => jobPath(j) === route.next) : null;
-  const tab = (on) => ({ bg: on ? '#FFFEFB' : 'transparent', fg: on ? '#18181B' : '#5C5A55', sh: on ? '0 1px 3px rgba(24,24,27,0.12)' : 'none' });
+  const tab = (on) => ({ bg: on ? 'var(--c-paper)' : 'transparent', fg: on ? 'var(--c-ink)' : 'var(--c-text3)', sh: on ? '0 1px 3px rgba(24,24,27,0.12)' : 'none' });
   const lt = tab(!isReg), rt = tab(isReg);
   const authPath = (mode) => page === 'auth'
     ? `/${mode}${route.next ? `?next=${encodeURIComponent(route.next)}` : ''}`
@@ -400,13 +435,14 @@ export default function App() {
 
   const v = {
     progress: '0%',
-    navItems: nav.map(([k, label, path]) => ({ label, color: navPage === k ? '#18181B' : '#5C5A55', bar: navPage === k ? 1 : 0, onClick: () => go(path) })),
+    navItems: nav.map(([k, label, path]) => ({ label, color: navPage === k ? 'var(--c-ink)' : 'var(--c-text3)', bar: navPage === k ? 1 : 0, onClick: () => go(path) })),
     signedIn: !!user, signedOut: !user,
     userInitial: user?.name?.charAt(0).toUpperCase() || '', userName: user?.name?.split(' ')[0] || '', userEmail: user?.email || profile?.email || '',
-    avatarRing: page === 'profile' ? '0 0 0 3px #FAF8F3,0 0 0 5px #5B4FF5' : 'none',
+    avatarRing: page === 'profile' ? '0 0 0 3px var(--c-bg),0 0 0 5px #5B4FF5' : 'none',
     goLanding: () => go(user ? '/jobs' : '/'), goHome: () => go('/jobs'), goPost: () => go('/post'),
     goAuth: () => go('/login'), goProfile: () => go('/profile'), goMe: () => go('/me'),
     signOut,
+    navTools: <NavTools dark={theme.dark} onToggleTheme={theme.toggle} onSearch={() => { setCmdQuery(''); setCmdOpen(true); }}/>,
 
     // Landing
     marquee: <Marquee companies={[...new Set(jobs.map(j => j.company))]}/>, shimmer: <Shimmer/>, liveDot: <LiveDot/>, spinner: <Spinner/>,
@@ -435,15 +471,16 @@ export default function App() {
     clearFilters: () => { setTypes([]); setCities([]); setStacks([]); setPageNum(1); },
     clearAll: () => { setTypes([]); setCities([]); setStacks([]); setQuery(''); setPageNum(1); },
     typeOpts: TYPES.map(t => ({ label: t, ...pill(types.includes(t)), onClick: () => toggleIn(setTypes, t) })),
-    cityOpts: topCities.map(c => { const on = cities.includes(c); return { label: c, count: cityCount[c] || 0, check: on ? '✓' : '', border: on ? '#5B4FF5' : '#D5D0C4', bg: on ? '#5B4FF5' : '#FFFEFB', onClick: () => toggleIn(setCities, c) }; }),
-    stackOpts: STACKS.map(t => { const on = stacks.includes(t); return { label: t, border: on ? '#5B4FF5' : '#E8E4DA', bg: on ? '#EEEBFF' : '#F1EEE5', fg: on ? '#4438D9' : '#3F3D38', onClick: () => toggleIn(setStacks, t) }; }),
+    cityOpts: topCities.map(c => { const on = cities.includes(c); return { label: c, count: cityCount[c] || 0, check: on ? '✓' : '', border: on ? '#5B4FF5' : 'var(--c-line2)', bg: on ? '#5B4FF5' : 'var(--c-paper)', onClick: () => toggleIn(setCities, c) }; }),
+    stackOpts: STACKS.map(t => { const on = stacks.includes(t); return { label: t, border: on ? '#5B4FF5' : 'var(--c-line)', bg: on ? 'var(--c-tint)' : 'var(--c-sunk)', fg: on ? 'var(--c-accent-ink)' : 'var(--c-text2)', onClick: () => toggleIn(setStacks, t) }; }),
     sort, onSort: (e) => { setSort(e.target.value); setPageNum(1); },
     resultsLabel: filtered.length ? `Showing ${from}–${to} of ${filtered.length} jobs` : 'No jobs found',
-    pageJobs: filtered.slice((cur - 1) * PAGE_SIZE, cur * PAGE_SIZE).map(decorate), noResults: !filtered.length, showPager: totalPages > 1,
+    pageJobs: filtered.slice((cur - 1) * PAGE_SIZE, cur * PAGE_SIZE).map(decorate), noResults: !jobsLoading && !filtered.length,
+    skeleton: jobsLoading && !jobs.length ? <SkeletonList/> : null, showPager: totalPages > 1,
     // Long result sets show the first, last and nearby page numbers only.
     pages: Array.from({ length: totalPages }, (_, i) => i + 1)
       .filter(n => totalPages <= 7 || n === 1 || n === totalPages || Math.abs(n - cur) <= 2)
-      .map(n => { const on = n === cur; return { n, border: on ? '#18181B' : '#D5D0C4', bg: on ? '#5B4FF5' : '#FFFEFB', fg: on ? '#FFFEFB' : '#18181B', shadow: on ? '3px 3px 0 0 #18181B' : 'none', onClick: () => setPageNum(n) }; }),
+      .map(n => { const on = n === cur; return { n, border: on ? 'var(--c-ink)' : 'var(--c-line2)', bg: on ? '#5B4FF5' : 'var(--c-paper)', fg: on ? '#FFFEFB' : 'var(--c-ink)', shadow: on ? '3px 3px 0 0 var(--c-ink)' : 'none', onClick: () => setPageNum(n) }; }),
     atFirst: cur === 1, atLast: cur === totalPages, prevOpacity: cur === 1 ? 0.4 : 1, nextOpacity: cur === totalPages ? 0.4 : 1,
     prevPage: () => setPageNum(Math.max(1, cur - 1)), nextPage: () => setPageNum(Math.min(totalPages, cur + 1)),
 
@@ -451,7 +488,7 @@ export default function App() {
     dj, applyJob,
     applyLabel: detailApplied ? '✓ Applied' : !user ? 'Sign in to apply' : dj0?.applyUrl ? 'Apply on company site ↗' : 'Apply on DevHire →',
     applyBg: detailApplied ? '#0F6E56' : '#5B4FF5',
-    share: () => { copy(window.location.href); setShareCopied(true); setTimeout(() => setShareCopied(false), 1800); },
+    share: () => { copy(window.location.href); setShareCopied(true); toast('Link copied'); setTimeout(() => setShareCopied(false), 1800); },
     shareLabel: shareCopied ? '✓ Link copied' : 'Copy link',
     aiNeedsAuth: !user, aiNeedsResume: !!user && !hasResume, aiReady: !!user && hasResume,
     signInForJob: () => requireAuth(here()),
@@ -462,16 +499,16 @@ export default function App() {
     strengths: match?.strengths || [], gaps: match?.gaps || [], hasGaps: !!match?.gaps?.length,
     noLetter: !jobAi.letter && !jobAi.letterBusy && !jobAi.letterError, letterBusy: !!jobAi.letterBusy, hasLetter: !!(jobAi.letter || jobAi.letterError),
     letterBox: jobAi.letter ? <LetterBox key={jobAi.letter.length} text={jobAi.letter}/>
-      : jobAi.letterError ? <p style={{ margin: 0, color: '#B42318', fontSize: 14 }}>{jobAi.letterError}</p> : null,
+      : jobAi.letterError ? <p style={{ margin: 0, color: 'var(--c-red)', fontSize: 14 }}>{jobAi.letterError}</p> : null,
     letterBtn: jobAi.letterBusy ? 'Writing…' : jobAi.letter || jobAi.letterError ? 'Regenerate' : '✦ Generate letter', genLetter,
-    copyLabel: copied ? 'Copied ✓' : 'Copy', copyLetter: () => { copy(jobAi.letter || ''); setCopied(true); },
+    copyLabel: copied ? 'Copied ✓' : 'Copy', copyLetter: () => { copy(jobAi.letter || ''); setCopied(true); toast('Cover letter copied'); },
 
     // Not found
     missingPath: `${window.location.host}/#/jobs/${route.jobId || ''}`,
     similar: newest.map(decorate),
 
     // My jobs
-    meTabs: [['saved', 'Saved', my.saved.length], ['applied', 'Applied', my.applied.length]].map(([k, label, count]) => ({ label, count, weight: myTab === k ? 600 : 400, color: myTab === k ? '#18181B' : '#5C5A55', bar: myTab === k ? 1 : 0, onClick: () => setMyTab(k) })),
+    meTabs: [['saved', 'Saved', my.saved.length], ['applied', 'Applied', my.applied.length]].map(([k, label, count]) => ({ label, count, weight: myTab === k ? 600 : 400, color: myTab === k ? 'var(--c-ink)' : 'var(--c-text3)', bar: myTab === k ? 1 : 0, onClick: () => setMyTab(k) })),
     myList: (myTab === 'saved' ? my.saved : my.applied.map(a => a.job)).map(decorate),
     isSavedTab: myTab === 'saved', isAppliedTab: myTab !== 'saved',
     myEmptyTitle: myTab === 'saved' ? 'No saved jobs yet.' : 'You haven’t applied to anything yet.',
@@ -490,8 +527,8 @@ export default function App() {
     pickFile: () => fileInput?.click(), onUpload,
     uploadBusy, uploadIdle: !uploadBusy, uploadBtn: pf.resumeFileName ? '↑ Replace PDF' : '↑ Upload PDF',
     fileTitle: pf.resumeFileName || 'Drop your resume or click to upload', fileSub: pf.resumeFileName ? 'Uploaded · text extracted below' : 'PDF or TXT · max 2 MB',
-    dropBorder: pf.resumeFileName ? '#5B4FF5' : '#D5D0C4', dropBg: pf.resumeFileName ? '#F5F3FF' : '#FAF8F3',
-    saveProfile, saveProfileLabel: pfSaving ? 'Saving…' : 'Save profile', pfMsg, pfMsgColor: pfErr ? '#B42318' : '#0F6E56',
+    dropBorder: pf.resumeFileName ? '#5B4FF5' : 'var(--c-line2)', dropBg: pf.resumeFileName ? 'var(--c-tint2)' : 'var(--c-bg)',
+    saveProfile, saveProfileLabel: pfSaving ? 'Saving…' : 'Save profile', pfMsg, pfMsgColor: pfErr ? 'var(--c-red)' : 'var(--c-green)',
 
     // Post
     signInForPost: () => requireAuth('/post'),
@@ -505,13 +542,13 @@ export default function App() {
 
     // Dashboard
     dashStats: [['Open roles', listings.length], ['Applicants', listings.reduce((n, j) => n + (j.counts?.total || 0), 0)], ['New to review', listings.reduce((n, j) => n + (j.counts?.New || 0), 0)]]
-      .map(([label, n], i) => ({ label, n, bg: i === 2 ? '#D2F53B' : '#FFFEFB', border: i === 2 ? '1.5px solid #18181B' : '1px solid #E8E4DA', shadow: i === 2 ? '3px 3px 0 0 #18181B' : 'none' })),
+      .map(([label, n], i) => ({ label, n, bg: i === 2 ? '#D2F53B' : 'var(--c-paper)', fg: i === 2 ? '#18181B' : 'var(--c-ink)', sub: i === 2 ? '#3F3D38' : 'var(--c-text2)', border: i === 2 ? '1.5px solid var(--c-ink)' : '1px solid var(--c-line)', shadow: i === 2 ? '3px 3px 0 0 var(--c-ink)' : 'none' })),
     dashEmpty: emp.loaded && !listings.length, dashHas: !!listings.length, dashMsg,
     dismissDashMsg: () => setDashMsg(''),
     myListings: listings.map(j => {
       const on = j.id === selId, total = j.counts?.total || 0, fresh = j.counts?.New || 0;
       return { ...decorate(j), appCount: plural(total, 'applicant'), newCount: fresh, hasNew: fresh > 0,
-        selBorder: on ? '#18181B' : '#E8E4DA', selShadow: on ? '5px 5px 0 0 #5B4FF5' : 'none', selShift: on ? 'translate(-3px,-3px)' : 'none',
+        selBorder: on ? 'var(--c-ink)' : 'var(--c-line)', selShadow: on ? '5px 5px 0 0 #5B4FF5' : 'none', selShift: on ? 'translate(-3px,-3px)' : 'none',
         onSelect: () => { setDashSel(j.id); setDashFilter('All'); },
         onEdit: (e) => { e.stopPropagation(); go(`/post/${j.id}`); },
         onDelete: (e) => { e.stopPropagation(); setConfirmDel(j.id); },
@@ -523,11 +560,11 @@ export default function App() {
     apps: shownApps.map(a => {
       const sty = ST_STYLE[a.status] || ST_STYLE.New;
       return { ...a, initials: a.name.split(' ').map(x => x[0]).join('').slice(0, 2).toUpperCase(), when: ago(daysSince(a.appliedAt)),
-        matchLabel: a.match != null ? a.match + '%' : '—', matchColor: a.match >= 80 ? '#0F6E56' : a.match >= 65 ? '#5B4FF5' : '#75726A',
+        matchLabel: a.match != null ? a.match + '%' : '—', matchColor: a.match >= 80 ? 'var(--c-green)' : a.match >= 65 ? 'var(--c-accent-text)' : 'var(--c-muted)',
         stBg: sty[0], stFg: sty[1], shortLabel: a.status === 'Shortlisted' ? '✓ Shortlisted' : 'Shortlist', rejLabel: a.status === 'Rejected' ? 'Rejected' : 'Reject',
-        shortBg: a.status === 'Shortlisted' ? '#5B4FF5' : 'transparent', shortFg: a.status === 'Shortlisted' ? '#FFFEFB' : '#5B4FF5',
+        shortBg: a.status === 'Shortlisted' ? '#5B4FF5' : 'transparent', shortFg: a.status === 'Shortlisted' ? '#FFFEFB' : 'var(--c-accent-text)',
         rowOpacity: a.status === 'Rejected' ? 0.6 : 1,
-        onShort: () => emp.setStatus(selId, a, 'Shortlisted'), onRej: () => emp.setStatus(selId, a, 'Rejected') };
+        onShort: () => { if (a.status !== 'Shortlisted') toast(`${a.name} shortlisted`, '★'); emp.setStatus(selId, a, 'Shortlisted'); }, onRej: () => emp.setStatus(selId, a, 'Rejected') };
     }),
     appsEmpty: !shownApps.length,
     appsEmptyText: !emp.applicants[selId] ? 'Loading applicants…' : selApps.length ? `No ${dashFilter.toLowerCase()} applicants.` : 'No applicants yet — new listings usually get their first within a day.',
@@ -552,7 +589,33 @@ export default function App() {
   else if (page === 'dash') content = <DashboardPage v={v}/>;
   else if (page === 'company') content = <CompanyPage v={v}/>;
 
-  return <Shell v={v}>{content}</Shell>;
+  // Command palette contents: matching jobs + companies, then pages and actions.
+  const cq = cmdQuery.trim().toLowerCase();
+  const cmdJobs = cq ? jobs.filter(j => `${j.title} ${j.company} ${j.city} ${j.tags.join(' ')}`.toLowerCase().includes(cq)).slice(0, 6) : newest;
+  const cmdCompanies = cq ? [...new Set(jobs.map(j => j.company))].filter(c => c.toLowerCase().includes(cq)).slice(0, 4) : [];
+  const actions = [
+    ['⌕', 'Browse all jobs', () => go('/jobs')],
+    ['＋', 'Post a role', () => go('/post')],
+    ...(user ? [['★', 'My saved & applied jobs', () => go('/me')], ['▦', 'Employer dashboard', () => go('/dashboard')], ['☺', 'Edit profile & resume', () => go('/profile')]] : [['→', 'Sign in', () => go('/login')], ['✦', 'Create an account', () => go('/register')]]),
+    [theme.dark ? '☀' : '☾', theme.dark ? 'Switch to light mode' : 'Switch to dark mode', () => theme.toggle()],
+    ...(user ? [['⎋', 'Sign out', signOut]] : []),
+  ].filter(([, label]) => !cq || label.toLowerCase().includes(cq)).map(([icon, label, run]) => ({ icon, label, run }));
+  const cmdSections = [
+    { title: cq ? 'Jobs' : 'Latest jobs', items: cmdJobs.map(j => ({ icon: '◆', label: j.title, sub: `${j.company} · ${j.city}`, run: () => go(jobPath(j)) })) },
+    { title: 'Companies', items: cmdCompanies.map(c => ({ icon: '▣', label: c, sub: 'Company page', run: () => go(`/company/${encodeURIComponent(c)}`) })) },
+    { title: 'Go to', items: actions },
+    ...(cq ? [{ title: 'Search', items: [{ icon: '⌕', label: `Search the board for “${cmdQuery.trim()}”`, run: () => { setQuery(cmdQuery.trim()); setPageNum(1); go('/jobs'); } }] }] : []),
+  ];
+
+  return (
+    <>
+      <Shell v={v}>{content}</Shell>
+      <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} query={cmdQuery} onQuery={setCmdQuery} sections={cmdSections}/>
+      <TopLoader/>
+      <Toasts toasts={toasts}/>
+      <BackToTop/>
+    </>
+  );
 }
 
 function Loading() {

@@ -15,4 +15,12 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Report in-flight requests to the top loading bar (see TopLoader).
+const busy = (d) => window.dispatchEvent(new CustomEvent('dh:busy', { detail: d }));
+api.interceptors.request.use((config) => { busy(1); return config; });
+api.interceptors.response.use(
+  (res) => { busy(-1); return res; },
+  (err) => { busy(-1); return Promise.reject(err); },
+);
+
 export default api;

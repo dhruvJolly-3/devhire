@@ -1,10 +1,10 @@
 // Helpers that turn API data into the fields the design pages render.
 
-export const PAL = [['#EEEBFF', '#4438D9'], ['#EDF7D0', '#3F5A00'], ['#FCE9DE', '#9A3B0B'], ['#E3F1EC', '#0F6E56'], ['#F1EEE5', '#3F3D38'], ['#FDF0D5', '#8A5A00']];
+export const PAL = [['var(--c-tint)', 'var(--c-accent-ink)'], ['#EDF7D0', '#3F5A00'], ['#FCE9DE', '#9A3B0B'], ['#E3F1EC', '#0F6E56'], ['var(--c-sunk)', 'var(--c-text2)'], ['#FDF0D5', '#8A5A00']];
 export const TYPES = ['Remote', 'Hybrid', 'Onsite'];
 export const STACKS = ['React', 'Node.js', 'TypeScript', 'MongoDB', 'Go', 'Python', 'AWS', 'Kubernetes'];
 export const STATUSES = ['All', 'New', 'Shortlisted', 'Rejected'];
-export const ST_STYLE = { New: ['#D2F53B', '#18181B'], Shortlisted: ['#EEEBFF', '#4438D9'], Rejected: ['#F1EEE5', '#75726A'] };
+export const ST_STYLE = { New: ['#D2F53B', '#18181B'], Shortlisted: ['var(--c-tint)', 'var(--c-accent-ink)'], Rejected: ['var(--c-sunk)', 'var(--c-muted)'] };
 export const PAGE_SIZE = 10;
 
 const hash = (s = '') => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); };
@@ -22,7 +22,7 @@ export const payOf = (salary = '') => {
   return max >= 1000 ? max / 100000 : max;
 };
 
-export const pill = (on) => ({ border: on ? '#18181B' : '#D5D0C4', bg: on ? '#18181B' : '#FFFEFB', fg: on ? '#FFFEFB' : '#3F3D38' });
+export const pill = (on) => ({ border: on ? 'var(--c-ink)' : 'var(--c-line2)', bg: on ? 'var(--c-ink)' : 'var(--c-paper)', fg: on ? 'var(--c-paper)' : 'var(--c-text2)' });
 
 export const skillList = (skills) => (Array.isArray(skills) ? skills : String(skills || '').split(','))
   .map(x => String(x).trim()).filter(Boolean);

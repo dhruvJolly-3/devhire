@@ -12,7 +12,7 @@ export default function MyJobsPage({ v }) {
           {' '}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {' '}
-            <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "#5B4FF5", letterSpacing: "0.08em" }}>
+            <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "var(--c-accent-text)", letterSpacing: "0.08em" }}>
               / MY JOBS
             </span>
             {' '}
@@ -24,20 +24,20 @@ export default function MyJobsPage({ v }) {
           {' '}
           <div style={{ display: "flex", gap: "12px" }}>
             {' '}
-            <div style={{ padding: "14px 18px", borderRadius: "12px", background: "#FFFEFB", border: "1px solid #E8E4DA", display: "flex", flexDirection: "column", gap: "2px", minWidth: "96px" }}>
+            <div style={{ padding: "14px 18px", borderRadius: "12px", background: "var(--c-paper)", border: "1px solid var(--c-line)", display: "flex", flexDirection: "column", gap: "2px", minWidth: "96px" }}>
               <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "24px", fontWeight: "500" }}>
                 {v.savedCount}
               </span>
-              <span style={{ fontSize: "13px", color: "#75726A" }}>
+              <span style={{ fontSize: "13px", color: "var(--c-muted)" }}>
                 Saved
               </span>
             </div>
             {' '}
-            <div style={{ padding: "14px 18px", borderRadius: "12px", background: "#D2F53B", border: "1.5px solid #18181B", boxShadow: "3px 3px 0 0 #18181B", display: "flex", flexDirection: "column", gap: "2px", minWidth: "96px" }}>
+            <div style={{ padding: "14px 18px", borderRadius: "12px", background: "#D2F53B", border: "1.5px solid var(--c-ink)", boxShadow: "3px 3px 0 0 var(--c-ink)", display: "flex", flexDirection: "column", gap: "2px", minWidth: "96px" }}>
               <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "24px", fontWeight: "500" }}>
                 {v.appliedCount}
               </span>
-              <span style={{ fontSize: "13px", color: "#18181B" }}>
+              <span style={{ fontSize: "13px", color: "var(--c-ink)" }}>
                 Applied
               </span>
             </div>
@@ -46,14 +46,14 @@ export default function MyJobsPage({ v }) {
           {' '}
         </div>
         {' '}
-        <div role="tablist" data-rise="1" style={{ display: "flex", gap: "4px", borderBottom: "1px solid #E8E4DA" }}>
+        <div role="tablist" data-rise="1" style={{ display: "flex", gap: "4px", borderBottom: "1px solid var(--c-line)" }}>
           {' '}
           {(v.meTabs || []).map((tb, i0) => (
             <Fragment key={tb?.id ?? i0}>
               {' '}
               <button role="tab" onClick={tb.onClick} style={{ position: "relative", padding: "12px 16px", border: "none", background: "none", cursor: "pointer", fontSize: "15px", fontWeight: tb.weight, color: tb.color }}>
                 {tb.label}{' '}
-                <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "2px 7px", borderRadius: "99px", background: "#F1EEE5", color: "#3F3D38" }}>
+                <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "2px 7px", borderRadius: "99px", background: "var(--c-sunk)", color: "var(--c-text2)" }}>
                   {tb.count}
                 </span>
                 <span style={{ position: "absolute", left: "0", right: "0", bottom: "-1px", height: "2px", background: "#5B4FF5", opacity: tb.bar, transition: "opacity .2s" }}/>
@@ -69,7 +69,7 @@ export default function MyJobsPage({ v }) {
           {(v.myList || []).map((j, i0) => (
             <Fragment key={j?.id ?? i0}>
               {' '}
-              <article onClick={j.onOpen} style={{ cursor: "pointer", background: "#FFFEFB", border: "1.5px solid #E8E4DA", borderRadius: "14px", padding: "24px", display: "flex", gap: "20px", alignItems: "center", flexWrap: "wrap", transition: "transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,border-color .25s" }} className="dh32">
+              <article onClick={j.onOpen} style={{ cursor: "pointer", background: "var(--c-paper)", border: "1.5px solid var(--c-line)", borderRadius: "14px", padding: "24px", display: "flex", gap: "20px", alignItems: "center", flexWrap: "wrap", transition: "transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,border-color .25s" }} className="dh32">
                 {' '}
                 <div style={{ width: "48px", height: "48px", flexShrink: "0", borderRadius: "12px", background: j.avBg, color: j.avFg, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600", fontSize: "15px" }}>
                   {j.initials}
@@ -77,7 +77,7 @@ export default function MyJobsPage({ v }) {
                 {' '}
                 <div style={{ flex: "1 1 240px", minWidth: "0", display: "flex", flexDirection: "column", gap: "6px" }}>
                   {' '}
-                  <span style={{ fontSize: "14px", color: "#5C5A55" }}>
+                  <span style={{ fontSize: "14px", color: "var(--c-text3)" }}>
                     {j.company} · {j.location}
                   </span>
                   {' '}
@@ -98,11 +98,11 @@ export default function MyJobsPage({ v }) {
                       {' '}
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
                         {' '}
-                        <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "4px 9px", borderRadius: "6px", background: "rgba(15,110,86,0.1)", color: "#0F6E56" }}>
+                        <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "4px 9px", borderRadius: "6px", background: "rgba(15,110,86,0.1)", color: "var(--c-green)" }}>
                           ✓ Applied
                         </span>
                         {' '}
-                        <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "#75726A" }}>
+                        <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "var(--c-muted)" }}>
                           {j.appliedWhen}
                         </span>
                         {' '}
@@ -127,17 +127,17 @@ export default function MyJobsPage({ v }) {
         {v.myEmpty ? (
           <>
             {' '}
-            <div style={{ position: "relative", borderRadius: "14px", border: "1.5px dashed #D5D0C4", padding: "64px 24px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", overflow: "hidden" }}>
+            <div style={{ position: "relative", borderRadius: "14px", border: "1.5px dashed var(--c-line2)", padding: "64px 24px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", overflow: "hidden" }}>
               {' '}
               {v.isSavedTab ? (
                 <>
-                  <img src="/assets/empty-saved.jpg" alt="" style={{ width: "180px", height: "180px", objectFit: "cover", borderRadius: "14px", marginBottom: "12px" }}/>
+                  <img data-float="0.04" src="/assets/empty-saved.jpg" alt="" style={{ width: "180px", height: "180px", objectFit: "cover", borderRadius: "14px", marginBottom: "12px" }}/>
                 </>
               ) : null}
               {' '}
               {v.isAppliedTab ? (
                 <>
-                  <img src="/assets/empty-applied.jpg" alt="" style={{ width: "180px", height: "180px", objectFit: "cover", borderRadius: "14px", marginBottom: "12px" }}/>
+                  <img data-float="0.04" src="/assets/empty-applied.jpg" alt="" style={{ width: "180px", height: "180px", objectFit: "cover", borderRadius: "14px", marginBottom: "12px" }}/>
                 </>
               ) : null}
               {' '}
@@ -145,7 +145,7 @@ export default function MyJobsPage({ v }) {
                 {v.myEmptyTitle}
               </span>
               {' '}
-              <span style={{ fontSize: "14px", color: "#5C5A55" }}>
+              <span style={{ fontSize: "14px", color: "var(--c-text3)" }}>
                 {v.myEmptySub}
               </span>
               {' '}

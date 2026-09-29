@@ -8,17 +8,17 @@ export default function JobsPage({ v }) {
       {' '}
       <div data-screen-label="03 Job board">
         {' '}
-        <div style={{ position: "relative", overflow: "hidden", borderBottom: "1px solid #E8E4DA" }}>
+        <div style={{ position: "relative", overflow: "hidden", borderBottom: "1px solid var(--c-line)" }}>
           {' '}
-          <div aria-hidden="true" data-parallax="0.2" style={{ position: "absolute", inset: "-18% 0", background: "#F1E9DD url(\"/assets/board-banner.jpg\") 78% 56%/cover no-repeat", pointerEvents: "none", willChange: "transform" }}/>
+          <div aria-hidden="true" data-parallax="0.2" style={{ position: "absolute", inset: "-18% 0", background: "var(--c-sand2) url(\"/assets/board-banner.jpg\") 78% 56%/cover no-repeat", pointerEvents: "none", willChange: "transform" }}/>
           {' '}
-          <div aria-hidden="true" style={{ position: "absolute", inset: "0", background: "linear-gradient(90deg,rgba(250,248,243,0.92) 0%,rgba(250,248,243,0.6) 45%,rgba(250,248,243,0) 70%)", pointerEvents: "none" }}/>
+          <div aria-hidden="true" style={{ position: "absolute", inset: "0", background: "linear-gradient(90deg,rgba(var(--c-bg-rgb),0.92) 0%,rgba(var(--c-bg-rgb),0.6) 45%,rgba(var(--c-bg-rgb),0) 70%)", pointerEvents: "none" }}/>
           {' '}
           <div style={{ position: "relative", maxWidth: "1200px", margin: "0 auto", padding: "56px 32px 40px", display: "flex", flexDirection: "column", gap: "24px" }}>
             {' '}
             <div data-rise="0" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               {' '}
-              <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "#5B4FF5", letterSpacing: "0.08em" }}>
+              <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "var(--c-accent-text)", letterSpacing: "0.08em" }}>
                 / JOB BOARD
               </span>
               {' '}
@@ -30,15 +30,15 @@ export default function JobsPage({ v }) {
             {' '}
             <div data-rise="1" style={{ position: "relative", maxWidth: "760px" }}>
               {' '}
-              <div aria-hidden="true" style={{ position: "absolute", inset: "0", borderRadius: "14px", background: "#18181B", transform: "translate(5px,5px)" }}/>
+              <div aria-hidden="true" style={{ position: "absolute", inset: "0", borderRadius: "14px", background: "var(--c-ink)", transform: "translate(5px,5px)" }}/>
               {' '}
-              <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "12px", background: "#FFFEFB", border: "1.5px solid #18181B", borderRadius: "14px", padding: "0 8px 0 20px", height: "60px" }}>
+              <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "12px", background: "var(--c-paper)", border: "1.5px solid var(--c-ink)", borderRadius: "14px", padding: "0 8px 0 20px", height: "60px" }}>
                 {' '}
-                <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "14px", color: "#75726A" }}>
+                <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "14px", color: "var(--c-muted)" }}>
                   ⌕
                 </span>
                 {' '}
-                <input value={v.query} onChange={v.onQuery} aria-label="Search jobs" placeholder="Search by role, company, skill or city…" style={{ flex: "1", minWidth: "0", height: "100%", border: "none", background: "transparent", outline: "none", fontFamily: "'Geist Mono',monospace", fontSize: "14px", color: "#18181B" }}/>
+                <input value={v.query} onChange={v.onQuery} aria-label="Search jobs" placeholder="Search by role, company, skill or city…" style={{ flex: "1", minWidth: "0", height: "100%", border: "none", background: "transparent", outline: "none", fontFamily: "'Geist Mono',monospace", fontSize: "14px", color: "var(--c-ink)" }}/>
                 {' '}
                 {v.query ? (
                   <>
@@ -71,7 +71,7 @@ export default function JobsPage({ v }) {
               {v.nActive ? (
                 <>
                   {' '}
-                  <button onClick={v.clearFilters} style={{ background: "none", border: "none", padding: "0", fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "#5B4FF5", cursor: "pointer" }}>
+                  <button onClick={v.clearFilters} style={{ background: "none", border: "none", padding: "0", fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "var(--c-accent-text)", cursor: "pointer" }}>
                     Clear ({v.nActive})
                   </button>
                   {' '}
@@ -82,7 +82,7 @@ export default function JobsPage({ v }) {
             {' '}
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {' '}
-              <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "11px", color: "#75726A", letterSpacing: "0.08em" }}>
+              <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "11px", color: "var(--c-muted)", letterSpacing: "0.08em" }}>
                 WORK TYPE
               </span>
               {' '}
@@ -104,16 +104,16 @@ export default function JobsPage({ v }) {
             {' '}
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {' '}
-              <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "11px", color: "#75726A", letterSpacing: "0.08em" }}>
+              <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "11px", color: "var(--c-muted)", letterSpacing: "0.08em" }}>
                 CITY
               </span>
               {' '}
               {(v.cityOpts || []).map((o, i0) => (
                 <Fragment key={o?.id ?? i0}>
                   {' '}
-                  <button onClick={o.onClick} style={{ display: "flex", alignItems: "center", gap: "10px", background: "none", border: "none", padding: "4px 0", cursor: "pointer", fontSize: "14px", color: "#18181B", textAlign: "left" }} className="dh17">
+                  <button onClick={o.onClick} style={{ display: "flex", alignItems: "center", gap: "10px", background: "none", border: "none", padding: "4px 0", cursor: "pointer", fontSize: "14px", color: "var(--c-ink)", textAlign: "left" }} className="dh17">
                     {' '}
-                    <span style={{ width: "18px", height: "18px", borderRadius: "5px", border: `1.5px solid ${o.border}`, background: o.bg, color: "#FFFEFB", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .15s" }}>
+                    <span style={{ width: "18px", height: "18px", borderRadius: "5px", border: `1.5px solid ${o.border}`, background: o.bg, color: "var(--c-paper)", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .15s" }}>
                       {o.check}
                     </span>
                     {' '}
@@ -121,7 +121,7 @@ export default function JobsPage({ v }) {
                       {o.label}
                     </span>
                     {' '}
-                    <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "#75726A" }}>
+                    <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "var(--c-muted)" }}>
                       {o.count}
                     </span>
                     {' '}
@@ -134,7 +134,7 @@ export default function JobsPage({ v }) {
             {' '}
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {' '}
-              <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "11px", color: "#75726A", letterSpacing: "0.08em" }}>
+              <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "11px", color: "var(--c-muted)", letterSpacing: "0.08em" }}>
                 STACK
               </span>
               {' '}
@@ -160,11 +160,11 @@ export default function JobsPage({ v }) {
             {' '}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
               {' '}
-              <span aria-live="polite" style={{ fontFamily: "'Geist Mono',monospace", fontSize: "13px", color: "#5C5A55" }}>
+              <span aria-live="polite" style={{ fontFamily: "'Geist Mono',monospace", fontSize: "13px", color: "var(--c-text3)" }}>
                 {v.resultsLabel}
               </span>
               {' '}
-              <select value={v.sort} onChange={v.onSort} aria-label="Sort jobs" style={{ height: "40px", padding: "0 12px", borderRadius: "10px", border: "1px solid #D5D0C4", background: "#FFFEFB", fontSize: "14px", color: "#18181B", cursor: "pointer" }}>
+              <select value={v.sort} onChange={v.onSort} aria-label="Sort jobs" style={{ height: "40px", padding: "0 12px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-paper)", fontSize: "14px", color: "var(--c-ink)", cursor: "pointer" }}>
                 <option value="Newest">
                   Sort: Newest
                 </option>
@@ -178,12 +178,13 @@ export default function JobsPage({ v }) {
               {' '}
             </div>
             {' '}
+            {v.skeleton}
             <div data-list="1" style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
               {' '}
               {(v.pageJobs || []).map((j, i0) => (
                 <Fragment key={j?.id ?? i0}>
                   {' '}
-                  <article onClick={j.onOpen} style={{ cursor: "pointer", position: "relative", background: "#FFFEFB", border: "1.5px solid #E8E4DA", borderRadius: "14px", padding: "24px", display: "flex", gap: "20px", alignItems: "flex-start", flexWrap: "wrap", transition: "transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,border-color .25s" }} className="dh18">
+                  <article onClick={j.onOpen} style={{ cursor: "pointer", position: "relative", background: "var(--c-paper)", border: "1.5px solid var(--c-line)", borderRadius: "14px", padding: "24px", display: "flex", gap: "20px", alignItems: "flex-start", flexWrap: "wrap", transition: "transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,border-color .25s" }} className="dh18">
                     {' '}
                     <div style={{ width: "48px", height: "48px", flexShrink: "0", borderRadius: "12px", background: j.avBg, color: j.avFg, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600", fontSize: "15px" }}>
                       {j.initials}
@@ -191,25 +192,25 @@ export default function JobsPage({ v }) {
                     {' '}
                     <div style={{ flex: "1 1 260px", minWidth: "0", display: "flex", flexDirection: "column", gap: "10px" }}>
                       {' '}
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", fontSize: "14px", color: "#5C5A55" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", fontSize: "14px", color: "var(--c-text3)" }}>
                         {' '}
-                        <button onClick={j.onCompany} style={{ background: "none", border: "none", padding: "0", fontSize: "14px", color: "#5C5A55", cursor: "pointer", textDecoration: "underline", textDecorationColor: "transparent", textUnderlineOffset: "3px", transition: "all .15s" }} className="dh19">
+                        <button onClick={j.onCompany} style={{ background: "none", border: "none", padding: "0", fontSize: "14px", color: "var(--c-text3)", cursor: "pointer", textDecoration: "underline", textDecorationColor: "transparent", textUnderlineOffset: "3px", transition: "all .15s" }} className="dh19">
                           {j.company}
                         </button>
                         {' '}
                         {j.via ? (
                           <>
-                            <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "#5B4FF5" }}>
+                            <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "var(--c-accent-text)" }}>
                               via {j.via}
                             </span>
                           </>
                         ) : null}
                         {' '}
-                        <span style={{ color: "#A09D94" }}>
+                        <span style={{ color: "var(--c-faint)" }}>
                           ·
                         </span>
                         {' '}
-                        <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "#75726A" }}>
+                        <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "var(--c-muted)" }}>
                           {j.posted}
                         </span>
                         {' '}
@@ -229,14 +230,14 @@ export default function JobsPage({ v }) {
                       {' '}
                       <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                         {' '}
-                        <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "4px 9px", borderRadius: "6px", background: "#EEEBFF", color: "#4438D9" }}>
+                        <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "4px 9px", borderRadius: "6px", background: "var(--c-tint)", color: "var(--c-accent-ink)" }}>
                           {j.type}
                         </span>
                         {' '}
                         {(j.tags || []).map((t, i1) => (
                           <Fragment key={t?.id ?? i1}>
                             {' '}
-                            <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "4px 9px", borderRadius: "6px", background: "#F1EEE5", color: "#3F3D38" }}>
+                            <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "4px 9px", borderRadius: "6px", background: "var(--c-sunk)", color: "var(--c-text2)" }}>
                               {t}
                             </span>
                             {' '}
@@ -253,7 +254,7 @@ export default function JobsPage({ v }) {
                         {' '}
                         {j.applied ? (
                           <>
-                            <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "11px", padding: "4px 8px", borderRadius: "6px", background: "rgba(15,110,86,0.1)", color: "#0F6E56" }}>
+                            <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "11px", padding: "4px 8px", borderRadius: "6px", background: "rgba(15,110,86,0.1)", color: "var(--c-green)" }}>
                               ✓ Applied
                             </span>
                           </>
@@ -269,7 +270,7 @@ export default function JobsPage({ v }) {
                         {j.salary}
                       </span>
                       {' '}
-                      <span style={{ fontSize: "13px", color: "#75726A" }}>
+                      <span style={{ fontSize: "13px", color: "var(--c-muted)" }}>
                         {j.location} ·{' '}
                         <span style={{ fontFamily: "'Geist Mono',monospace" }}>
                           {j.exp}
@@ -288,15 +289,15 @@ export default function JobsPage({ v }) {
             {v.noResults ? (
               <>
                 {' '}
-                <div style={{ borderRadius: "14px", border: "1.5px dashed #D5D0C4", padding: "40px 24px 56px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                <div style={{ borderRadius: "14px", border: "1.5px dashed var(--c-line2)", padding: "40px 24px 56px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
                   {' '}
-                  <img src="/assets/empty-search.jpg" alt="" style={{ width: "180px", height: "180px", objectFit: "cover", borderRadius: "14px", marginBottom: "12px" }}/>
+                  <img data-float="0.04" src="/assets/empty-search.jpg" alt="" style={{ width: "180px", height: "180px", objectFit: "cover", borderRadius: "14px", marginBottom: "12px" }}/>
                   {' '}
                   <span style={{ fontSize: "17px", fontWeight: "500" }}>
                     No jobs match your search.
                   </span>
                   {' '}
-                  <span style={{ fontSize: "14px", color: "#5C5A55" }}>
+                  <span style={{ fontSize: "14px", color: "var(--c-text3)" }}>
                     Try fewer filters or a broader keyword.
                   </span>
                   {' '}
@@ -314,7 +315,7 @@ export default function JobsPage({ v }) {
                 {' '}
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "6px", paddingTop: "24px" }}>
                   {' '}
-                  <button onClick={v.prevPage} disabled={v.atFirst} style={{ height: "40px", padding: "0 14px", borderRadius: "10px", border: "1px solid #D5D0C4", background: "#FFFEFB", color: "#18181B", fontSize: "14px", cursor: "pointer", opacity: v.prevOpacity }}>
+                  <button onClick={v.prevPage} disabled={v.atFirst} style={{ height: "40px", padding: "0 14px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-paper)", color: "var(--c-ink)", fontSize: "14px", cursor: "pointer", opacity: v.prevOpacity }}>
                     ← Prev
                   </button>
                   {' '}
@@ -328,7 +329,7 @@ export default function JobsPage({ v }) {
                     </Fragment>
                   ))}
                   {' '}
-                  <button onClick={v.nextPage} disabled={v.atLast} style={{ height: "40px", padding: "0 14px", borderRadius: "10px", border: "1px solid #D5D0C4", background: "#FFFEFB", color: "#18181B", fontSize: "14px", cursor: "pointer", opacity: v.nextOpacity }}>
+                  <button onClick={v.nextPage} disabled={v.atLast} style={{ height: "40px", padding: "0 14px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-paper)", color: "var(--c-ink)", fontSize: "14px", cursor: "pointer", opacity: v.nextOpacity }}>
                     Next →
                   </button>
                   {' '}

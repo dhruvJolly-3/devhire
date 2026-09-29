@@ -9,7 +9,7 @@ export default function ProfilePage({ v, inputRef }) {
       {' '}
       <form data-screen-label="06 Profile" onSubmit={v.saveProfile} style={{ maxWidth: "860px", margin: "0 auto", padding: "40px 32px 112px", display: "flex", flexDirection: "column", gap: "24px" }}>
         {' '}
-        <div data-rise="0" aria-hidden="true" style={{ position: "relative", height: "200px", borderRadius: "14px", border: "1.5px solid #18181B", overflow: "hidden", background: "#F1E6D2" }}>
+        <div data-rise="0" aria-hidden="true" style={{ position: "relative", height: "200px", borderRadius: "14px", border: "1.5px solid var(--c-ink)", overflow: "hidden", background: "var(--c-sand)" }}>
           {' '}
           <div data-parallax="0.15" style={{ position: "absolute", inset: "-20% 0", background: "url(\"/assets/profile-banner.jpg\") 80% 60%/cover no-repeat", willChange: "transform" }}/>
           {' '}
@@ -23,7 +23,7 @@ export default function ProfilePage({ v, inputRef }) {
               {' '}
               <div style={{ position: "absolute", inset: "0", borderRadius: "50%", background: "#5B4FF5", transform: "translate(4px,4px)" }}/>
               {' '}
-              <div style={{ position: "absolute", inset: "0", borderRadius: "50%", background: "#D2F53B", border: "1.5px solid #18181B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "34px", fontWeight: "600" }}>
+              <div style={{ position: "absolute", inset: "0", borderRadius: "50%", background: "#D2F53B", border: "1.5px solid var(--c-ink)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "34px", fontWeight: "600" }}>
                 {v.userInitial}
               </div>
               {' '}
@@ -37,20 +37,20 @@ export default function ProfilePage({ v, inputRef }) {
               {' '}
               {v.pf.headline ? (
                 <>
-                  <span style={{ fontSize: "16px", color: "#3F3D38", lineHeight: "1.4" }}>
+                  <span style={{ fontSize: "16px", color: "var(--c-text2)", lineHeight: "1.4" }}>
                     {v.pf.headline}
                   </span>
                 </>
               ) : null}
               {' '}
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", fontSize: "14px", color: "#5C5A55" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", fontSize: "14px", color: "var(--c-text3)" }}>
                 {' '}
                 {v.pf.location ? (
                   <>
                     <span>
                       {v.pf.location}
                     </span>
-                    <span style={{ color: "#A09D94" }}>
+                    <span style={{ color: "var(--c-faint)" }}>
                       ·
                     </span>
                   </>
@@ -69,19 +69,19 @@ export default function ProfilePage({ v, inputRef }) {
           <div style={{ flex: "0 1 240px", minWidth: "200px", display: "flex", flexDirection: "column", gap: "8px", paddingTop: "6px" }}>
             {' '}
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-              <span style={{ color: "#5C5A55" }}>
+              <span style={{ color: "var(--c-text3)" }}>
                 Profile strength
               </span>
-              <span style={{ fontFamily: "'Geist Mono',monospace", color: "#5B4FF5" }}>
+              <span style={{ fontFamily: "'Geist Mono',monospace", color: "var(--c-accent-text)" }}>
                 {v.completeLabel}
               </span>
             </div>
             {' '}
-            <div style={{ height: "8px", borderRadius: "99px", background: "#E8E4DA", overflow: "hidden" }}>
+            <div style={{ height: "8px", borderRadius: "99px", background: "var(--c-line)", overflow: "hidden" }}>
               <div style={{ height: "100%", width: v.completeLabel, borderRadius: "99px", background: "linear-gradient(90deg,#5B4FF5,#8B80FF)", transition: "width .6s cubic-bezier(.22,1,.36,1)" }}/>
             </div>
             {' '}
-            <span style={{ fontSize: "12px", color: "#75726A" }}>
+            <span style={{ fontSize: "12px", color: "var(--c-muted)" }}>
               {v.nextStep}
             </span>
             {' '}
@@ -89,7 +89,7 @@ export default function ProfilePage({ v, inputRef }) {
           {' '}
         </div>
         {' '}
-        <section data-rise="1" style={{ background: "#FFFEFB", border: "1px solid #E8E4DA", borderRadius: "14px", padding: "32px", display: "flex", flexDirection: "column", gap: "18px" }}>
+        <section data-rise="1" style={{ background: "var(--c-paper)", border: "1px solid var(--c-line)", borderRadius: "14px", padding: "32px", display: "flex", flexDirection: "column", gap: "18px" }}>
           {' '}
           <h2 style={{ margin: "0", fontSize: "18px", fontWeight: "600" }}>
             About you
@@ -97,31 +97,31 @@ export default function ProfilePage({ v, inputRef }) {
           {' '}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,240px),1fr))", gap: "16px" }}>
             {' '}
-            <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "#3F3D38" }}>
+            <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "var(--c-text2)" }}>
               Full name{' '}
-              <input name="name" value={v.pf.name} onChange={v.onPf} style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid #D5D0C4", background: "#FAF8F3", fontSize: "15px", color: "#18181B", outline: "none", transition: "all .2s" }} className="dh33"/>
+              <input name="name" value={v.pf.name} onChange={v.onPf} style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-bg)", fontSize: "15px", color: "var(--c-ink)", outline: "none", transition: "all .2s" }} className="dh33"/>
               {' '}
             </label>
             {' '}
-            <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "#3F3D38" }}>
+            <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "var(--c-text2)" }}>
               Location{' '}
-              <input name="location" value={v.pf.location} onChange={v.onPf} placeholder="Noida, Delhi NCR" style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid #D5D0C4", background: "#FAF8F3", fontSize: "15px", color: "#18181B", outline: "none", transition: "all .2s" }} className="dh34"/>
+              <input name="location" value={v.pf.location} onChange={v.onPf} placeholder="Noida, Delhi NCR" style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-bg)", fontSize: "15px", color: "var(--c-ink)", outline: "none", transition: "all .2s" }} className="dh34"/>
               {' '}
             </label>
             {' '}
           </div>
           {' '}
-          <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "#3F3D38" }}>
+          <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "var(--c-text2)" }}>
             Headline{' '}
-            <input name="headline" value={v.pf.headline} onChange={v.onPf} placeholder="MERN developer · React, Node.js, MongoDB" style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid #D5D0C4", background: "#FAF8F3", fontSize: "15px", color: "#18181B", outline: "none", transition: "all .2s" }} className="dh35"/>
+            <input name="headline" value={v.pf.headline} onChange={v.onPf} placeholder="MERN developer · React, Node.js, MongoDB" style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-bg)", fontSize: "15px", color: "var(--c-ink)", outline: "none", transition: "all .2s" }} className="dh35"/>
             {' '}
           </label>
           {' '}
-          <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "#3F3D38" }}>
+          <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "var(--c-text2)" }}>
             Skills{' '}
-            <input name="skills" value={v.pf.skills} onChange={v.onPf} placeholder="React, Node.js, Express, MongoDB" style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid #D5D0C4", background: "#FAF8F3", fontSize: "15px", color: "#18181B", outline: "none", fontFamily: "'Geist Mono',monospace", transition: "all .2s" }} className="dh36"/>
+            <input name="skills" value={v.pf.skills} onChange={v.onPf} placeholder="React, Node.js, Express, MongoDB" style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-bg)", fontSize: "15px", color: "var(--c-ink)", outline: "none", fontFamily: "'Geist Mono',monospace", transition: "all .2s" }} className="dh36"/>
             {' '}
-            <span style={{ fontSize: "12px", fontWeight: "400", color: "#75726A" }}>
+            <span style={{ fontSize: "12px", fontWeight: "400", color: "var(--c-muted)" }}>
               Comma separated.
             </span>
             {' '}
@@ -132,7 +132,7 @@ export default function ProfilePage({ v, inputRef }) {
             {(v.skillChips || []).map((s, i0) => (
               <Fragment key={s?.id ?? i0}>
                 {' '}
-                <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "5px 10px", borderRadius: "6px", background: "#EEEBFF", color: "#4438D9" }}>
+                <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", padding: "5px 10px", borderRadius: "6px", background: "var(--c-tint)", color: "var(--c-accent-ink)" }}>
                   {s}
                 </span>
                 {' '}
@@ -143,7 +143,7 @@ export default function ProfilePage({ v, inputRef }) {
           {' '}
         </section>
         {' '}
-        <section data-rise="2" style={{ background: "#FFFEFB", border: "1px solid #E8E4DA", borderRadius: "14px", padding: "32px", display: "flex", flexDirection: "column", gap: "18px" }}>
+        <section data-rise="2" style={{ background: "var(--c-paper)", border: "1px solid var(--c-line)", borderRadius: "14px", padding: "32px", display: "flex", flexDirection: "column", gap: "18px" }}>
           {' '}
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             {' '}
@@ -151,7 +151,7 @@ export default function ProfilePage({ v, inputRef }) {
               Resume
             </h2>
             {' '}
-            <span style={{ fontSize: "14px", color: "#5C5A55" }}>
+            <span style={{ fontSize: "14px", color: "var(--c-text3)" }}>
               The AI assistant reads this for match scores and cover letters.
             </span>
             {' '}
@@ -161,7 +161,7 @@ export default function ProfilePage({ v, inputRef }) {
           {' '}
           <div onClick={v.pickFile} style={{ cursor: "pointer", position: "relative", borderRadius: "14px", border: `1.5px dashed ${v.dropBorder}`, background: v.dropBg, padding: "28px", display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap", transition: "all .2s" }} className="dh37">
             {' '}
-            <img src="/assets/resume-upload.jpg" alt="" style={{ width: "96px", height: "96px", flexShrink: "0", objectFit: "cover", borderRadius: "12px", display: "block" }}/>
+            <img data-float="0.04" src="/assets/resume-upload.jpg" alt="" style={{ width: "96px", height: "96px", flexShrink: "0", objectFit: "cover", borderRadius: "12px", display: "block" }}/>
             {' '}
             <div style={{ flex: "1", minWidth: "200px", display: "flex", flexDirection: "column", gap: "4px" }}>
               {' '}
@@ -169,7 +169,7 @@ export default function ProfilePage({ v, inputRef }) {
                 {v.fileTitle}
               </span>
               {' '}
-              <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "#75726A" }}>
+              <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "var(--c-muted)" }}>
                 {v.fileSub}
               </span>
               {' '}
@@ -179,7 +179,7 @@ export default function ProfilePage({ v, inputRef }) {
               <>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   {v.spinner}
-                  <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "#5C5A55" }}>
+                  <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "var(--c-text3)" }}>
                     Reading PDF…
                   </span>
                 </div>
@@ -188,7 +188,7 @@ export default function ProfilePage({ v, inputRef }) {
             {' '}
             {v.uploadIdle ? (
               <>
-                <span style={{ padding: "10px 16px", borderRadius: "10px", border: "1px solid #5B4FF5", color: "#5B4FF5", fontFamily: "'Geist Mono',monospace", fontSize: "13px", fontWeight: "500" }}>
+                <span style={{ padding: "10px 16px", borderRadius: "10px", border: "1px solid #5B4FF5", color: "var(--c-accent-text)", fontFamily: "'Geist Mono',monospace", fontSize: "13px", fontWeight: "500" }}>
                   {v.uploadBtn}
                 </span>
               </>
@@ -196,11 +196,11 @@ export default function ProfilePage({ v, inputRef }) {
             {' '}
           </div>
           {' '}
-          <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "#3F3D38" }}>
+          <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "var(--c-text2)" }}>
             Resume text{' '}
-            <textarea name="resumeText" value={v.pf.resumeText} onChange={v.onPf} rows="7" placeholder="…or paste your resume here" style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid #D5D0C4", background: "#FAF8F3", fontSize: "14px", lineHeight: "1.6", color: "#18181B", outline: "none", resize: "vertical", transition: "all .2s" }} className="dh38"/>
+            <textarea name="resumeText" value={v.pf.resumeText} onChange={v.onPf} rows="7" placeholder="…or paste your resume here" style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-bg)", fontSize: "14px", lineHeight: "1.6", color: "var(--c-ink)", outline: "none", resize: "vertical", transition: "all .2s" }} className="dh38"/>
             {' '}
-            <span style={{ fontSize: "12px", fontWeight: "400", color: "#75726A" }}>
+            <span style={{ fontSize: "12px", fontWeight: "400", color: "var(--c-muted)" }}>
               PDF uploads fill this in. Edit it before saving.
             </span>
             {' '}
@@ -210,7 +210,7 @@ export default function ProfilePage({ v, inputRef }) {
         {' '}
         <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
           {' '}
-          <button type="submit" style={{ padding: "14px 26px", borderRadius: "12px", border: "1.5px solid #18181B", background: "#5B4FF5", color: "#FFFEFB", fontSize: "15px", fontWeight: "600", cursor: "pointer", boxShadow: "4px 4px 0 0 #18181B", transition: "all .15s" }} className="dh39 dh40">
+          <button type="submit" style={{ padding: "14px 26px", borderRadius: "12px", border: "1.5px solid var(--c-ink)", background: "#5B4FF5", color: "#FFFEFB", fontSize: "15px", fontWeight: "600", cursor: "pointer", boxShadow: "4px 4px 0 0 var(--c-ink)", transition: "all .15s" }} className="dh39 dh40">
             {v.saveProfileLabel}
           </button>
           {' '}

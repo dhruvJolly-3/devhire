@@ -12,7 +12,7 @@ export default function DashboardPage({ v }) {
           {' '}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {' '}
-            <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "#5B4FF5", letterSpacing: "0.08em" }}>
+            <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "var(--c-accent-text)", letterSpacing: "0.08em" }}>
               / EMPLOYER DASHBOARD
             </span>
             {' '}
@@ -24,9 +24,9 @@ export default function DashboardPage({ v }) {
           {' '}
           <div style={{ position: "relative" }}>
             {' '}
-            <div aria-hidden="true" style={{ position: "absolute", inset: "0", borderRadius: "12px", background: "#18181B", transform: "translate(4px,4px)" }}/>
+            <div aria-hidden="true" style={{ position: "absolute", inset: "0", borderRadius: "12px", background: "var(--c-ink)", transform: "translate(4px,4px)" }}/>
             {' '}
-            <button onClick={v.goPost} style={{ position: "relative", padding: "13px 22px", borderRadius: "12px", border: "1.5px solid #18181B", background: "#5B4FF5", color: "#FFFEFB", fontSize: "15px", fontWeight: "600", cursor: "pointer", transition: "transform .15s" }} className="dh51 dh52">
+            <button onClick={v.goPost} style={{ position: "relative", padding: "13px 22px", borderRadius: "12px", border: "1.5px solid var(--c-ink)", background: "#5B4FF5", color: "#FFFEFB", fontSize: "15px", fontWeight: "600", cursor: "pointer", transition: "transform .15s" }} className="dh51 dh52">
               + Post a role
             </button>
             {' '}
@@ -37,13 +37,13 @@ export default function DashboardPage({ v }) {
         {v.dashMsg ? (
           <>
             {' '}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", fontSize: "14px", color: "#0F6E56", background: "rgba(15,110,86,0.08)", border: "1px solid rgba(15,110,86,0.3)", borderRadius: "10px", padding: "12px 16px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", fontSize: "14px", color: "var(--c-green)", background: "rgba(15,110,86,0.08)", border: "1px solid rgba(15,110,86,0.3)", borderRadius: "10px", padding: "12px 16px" }}>
               {' '}
               <span>
                 {v.dashMsg}
               </span>
               {' '}
-              <button onClick={v.dismissDashMsg} aria-label="Dismiss" style={{ background: "none", border: "none", padding: "0", fontSize: "16px", color: "#0F6E56", cursor: "pointer" }}>
+              <button onClick={v.dismissDashMsg} aria-label="Dismiss" style={{ background: "none", border: "none", padding: "0", fontSize: "16px", color: "var(--c-green)", cursor: "pointer" }}>
                 ×
               </button>
               {' '}
@@ -57,13 +57,13 @@ export default function DashboardPage({ v }) {
           {(v.dashStats || []).map((st, i0) => (
             <Fragment key={st?.id ?? i0}>
               {' '}
-              <div style={{ padding: "20px 24px", borderRadius: "14px", background: st.bg, border: st.border, boxShadow: st.shadow, display: "flex", flexDirection: "column", gap: "4px" }}>
+              <div style={{ padding: "20px 24px", borderRadius: "14px", background: st.bg, color: st.fg, border: st.border, boxShadow: st.shadow, display: "flex", flexDirection: "column", gap: "4px" }}>
                 {' '}
                 <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "32px", fontWeight: "500", letterSpacing: "-0.02em" }}>
                   {st.n}
                 </span>
                 {' '}
-                <span style={{ fontSize: "14px", color: "#3F3D38" }}>
+                <span style={{ fontSize: "14px", color: st.sub }}>
                   {st.label}
                 </span>
                 {' '}
@@ -77,15 +77,15 @@ export default function DashboardPage({ v }) {
         {v.dashEmpty ? (
           <>
             {' '}
-            <div style={{ borderRadius: "14px", border: "1.5px dashed #D5D0C4", padding: "40px 24px 64px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+            <div style={{ borderRadius: "14px", border: "1.5px dashed var(--c-line2)", padding: "40px 24px 64px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
               {' '}
-              <img src="/assets/dash-empty.jpg" alt="" style={{ width: "180px", height: "180px", objectFit: "cover", borderRadius: "14px", marginBottom: "12px" }}/>
+              <img data-float="0.04" src="/assets/dash-empty.jpg" alt="" style={{ width: "180px", height: "180px", objectFit: "cover", borderRadius: "14px", marginBottom: "12px" }}/>
               {' '}
               <span style={{ fontSize: "17px", fontWeight: "500" }}>
                 You haven’t posted any roles yet.
               </span>
               {' '}
-              <span style={{ fontSize: "14px", color: "#5C5A55" }}>
+              <span style={{ fontSize: "14px", color: "var(--c-text3)" }}>
                 Post one and applicants will show up here.
               </span>
               {' '}
@@ -108,11 +108,11 @@ export default function DashboardPage({ v }) {
                 {(v.myListings || []).map((j, i0) => (
                   <Fragment key={j?.id ?? i0}>
                     {' '}
-                    <article onClick={j.onSelect} style={{ cursor: "pointer", background: "#FFFEFB", border: `1.5px solid ${j.selBorder}`, borderRadius: "14px", padding: "22px", display: "flex", flexDirection: "column", gap: "14px", boxShadow: j.selShadow, transform: j.selShift, transition: "all .25s cubic-bezier(.34,1.56,.64,1)" }} className="dh53">
+                    <article onClick={j.onSelect} style={{ cursor: "pointer", background: "var(--c-paper)", border: `1.5px solid ${j.selBorder}`, borderRadius: "14px", padding: "22px", display: "flex", flexDirection: "column", gap: "14px", boxShadow: j.selShadow, transform: j.selShift, transition: "all .25s cubic-bezier(.34,1.56,.64,1)" }} className="dh53">
                       {' '}
                       <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                         {' '}
-                        <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "#75726A" }}>
+                        <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", color: "var(--c-muted)" }}>
                           {j.type} · {j.posted}
                         </span>
                         {' '}
@@ -124,7 +124,7 @@ export default function DashboardPage({ v }) {
                       {' '}
                       <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                         {' '}
-                        <span style={{ fontSize: "14px", color: "#3F3D38" }}>
+                        <span style={{ fontSize: "14px", color: "var(--c-text2)" }}>
                           <span style={{ fontFamily: "'Geist Mono',monospace" }}>
                             {j.appCount}
                           </span>
@@ -140,17 +140,17 @@ export default function DashboardPage({ v }) {
                         {' '}
                       </div>
                       {' '}
-                      <div style={{ display: "flex", gap: "6px", paddingTop: "14px", borderTop: "1px solid #F0EBE1" }}>
+                      <div style={{ display: "flex", gap: "6px", paddingTop: "14px", borderTop: "1px solid var(--c-sunk2)" }}>
                         {' '}
-                        <button onClick={j.onView} style={{ padding: "7px 12px", borderRadius: "8px", border: "1px solid #E8E4DA", background: "transparent", color: "#3F3D38", fontSize: "13px", cursor: "pointer" }} className="dh54">
+                        <button onClick={j.onView} style={{ padding: "7px 12px", borderRadius: "8px", border: "1px solid var(--c-line)", background: "transparent", color: "var(--c-text2)", fontSize: "13px", cursor: "pointer" }} className="dh54">
                           View
                         </button>
                         {' '}
-                        <button onClick={j.onEdit} style={{ padding: "7px 12px", borderRadius: "8px", border: "1px solid #E8E4DA", background: "transparent", color: "#3F3D38", fontSize: "13px", cursor: "pointer" }} className="dh55">
+                        <button onClick={j.onEdit} style={{ padding: "7px 12px", borderRadius: "8px", border: "1px solid var(--c-line)", background: "transparent", color: "var(--c-text2)", fontSize: "13px", cursor: "pointer" }} className="dh55">
                           Edit
                         </button>
                         {' '}
-                        <button onClick={j.onDelete} style={{ marginLeft: "auto", padding: "7px 12px", borderRadius: "8px", border: "1px solid transparent", background: "transparent", color: "#B42318", fontSize: "13px", cursor: "pointer" }} className="dh56">
+                        <button onClick={j.onDelete} style={{ marginLeft: "auto", padding: "7px 12px", borderRadius: "8px", border: "1px solid transparent", background: "transparent", color: "var(--c-red)", fontSize: "13px", cursor: "pointer" }} className="dh56">
                           Delete
                         </button>
                         {' '}
@@ -163,13 +163,13 @@ export default function DashboardPage({ v }) {
                 {' '}
               </div>
               {' '}
-              <section data-rise="2" style={{ flex: "1 1 520px", minWidth: "0", background: "#FFFEFB", border: "1px solid #E8E4DA", borderRadius: "14px", padding: "28px", display: "flex", flexDirection: "column", gap: "20px" }}>
+              <section data-rise="2" style={{ flex: "1 1 520px", minWidth: "0", background: "var(--c-paper)", border: "1px solid var(--c-line)", borderRadius: "14px", padding: "28px", display: "flex", flexDirection: "column", gap: "20px" }}>
                 {' '}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", flexWrap: "wrap" }}>
                   {' '}
                   <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                     {' '}
-                    <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "11px", color: "#75726A", letterSpacing: "0.08em" }}>
+                    <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "11px", color: "var(--c-muted)", letterSpacing: "0.08em" }}>
                       APPLICANTS · {v.selCount}
                     </span>
                     {' '}
@@ -177,7 +177,7 @@ export default function DashboardPage({ v }) {
                       {v.selTitle}
                     </h2>
                     {' '}
-                    <span style={{ fontSize: "14px", color: "#5C5A55" }}>
+                    <span style={{ fontSize: "14px", color: "var(--c-text3)" }}>
                       {v.selMeta}
                     </span>
                     {' '}
@@ -207,9 +207,9 @@ export default function DashboardPage({ v }) {
                   {(v.apps || []).map((a, i0) => (
                     <Fragment key={a?.id ?? i0}>
                       {' '}
-                      <div style={{ display: "flex", gap: "16px", alignItems: "center", flexWrap: "wrap", padding: "18px 0", borderTop: "1px solid #F0EBE1", opacity: a.rowOpacity, transition: "opacity .2s" }}>
+                      <div style={{ display: "flex", gap: "16px", alignItems: "center", flexWrap: "wrap", padding: "18px 0", borderTop: "1px solid var(--c-sunk2)", opacity: a.rowOpacity, transition: "opacity .2s" }}>
                         {' '}
-                        <div style={{ width: "44px", height: "44px", flexShrink: "0", borderRadius: "50%", background: "#F1EEE5", color: "#3F3D38", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600", fontSize: "14px" }}>
+                        <div style={{ width: "44px", height: "44px", flexShrink: "0", borderRadius: "50%", background: "var(--c-sunk)", color: "var(--c-text2)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600", fontSize: "14px" }}>
                           {a.initials}
                         </div>
                         {' '}
@@ -227,7 +227,7 @@ export default function DashboardPage({ v }) {
                             {' '}
                           </div>
                           {' '}
-                          <span style={{ fontSize: "14px", color: "#5C5A55" }}>
+                          <span style={{ fontSize: "14px", color: "var(--c-text3)" }}>
                             {a.headline}
                           </span>
                           {' '}
@@ -236,7 +236,7 @@ export default function DashboardPage({ v }) {
                             {(a.skills || []).map((t, i1) => (
                               <Fragment key={t?.id ?? i1}>
                                 {' '}
-                                <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "11px", padding: "3px 8px", borderRadius: "5px", background: "#F1EEE5", color: "#3F3D38" }}>
+                                <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "11px", padding: "3px 8px", borderRadius: "5px", background: "var(--c-sunk)", color: "var(--c-text2)" }}>
                                   {t}
                                 </span>
                                 {' '}
@@ -253,7 +253,7 @@ export default function DashboardPage({ v }) {
                             {a.matchLabel}
                           </span>
                           {' '}
-                          <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "11px", color: "#75726A" }}>
+                          <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "11px", color: "var(--c-muted)" }}>
                             match · {a.when}
                           </span>
                           {' '}
@@ -265,7 +265,7 @@ export default function DashboardPage({ v }) {
                             {a.shortLabel}
                           </button>
                           {' '}
-                          <button onClick={a.onRej} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #E8E4DA", background: "transparent", color: "#5C5A55", fontSize: "13px", cursor: "pointer" }} className="dh57">
+                          <button onClick={a.onRej} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid var(--c-line)", background: "transparent", color: "var(--c-text3)", fontSize: "13px", cursor: "pointer" }} className="dh57">
                             {a.rejLabel}
                           </button>
                           {' '}
@@ -281,7 +281,7 @@ export default function DashboardPage({ v }) {
                 {v.appsEmpty ? (
                   <>
                     {' '}
-                    <div style={{ padding: "40px 16px", textAlign: "center", fontSize: "14px", color: "#5C5A55", borderTop: "1px solid #F0EBE1" }}>
+                    <div style={{ padding: "40px 16px", textAlign: "center", fontSize: "14px", color: "var(--c-text3)", borderTop: "1px solid var(--c-sunk2)" }}>
                       {v.appsEmptyText}
                     </div>
                     {' '}

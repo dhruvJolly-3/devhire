@@ -2,17 +2,19 @@
 // actions come in through `v` (built in src/App.jsx).
 import { Fragment } from 'react';
 
+import Footer from './Footer';
+
 export default function Shell({ v, children }) {
   return (
-    <div style={{ minHeight: "100vh", background: "#FAF8F3", position: "relative", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: "var(--c-bg)", position: "relative", display: "flex", flexDirection: "column" }}>
       {' '}
-      <div data-progress="1" style={{ position: "fixed", top: "0", left: "0", height: "3px", zIndex: "60", width: v.progress, background: "linear-gradient(90deg,#5B4FF5,#D2F53B)", transition: "width .1s linear" }}/>
+      <div data-progress="1" style={{ position: "fixed", top: "0", left: "0", height: "3px", zIndex: "60", width: "100%", transform: "scaleX(0)", transformOrigin: "0 50%", willChange: "transform", background: "linear-gradient(90deg,#5B4FF5,#D2F53B)", transition: "none" }}/>
       {' '}
-      <nav style={{ position: "sticky", top: "0", zIndex: "40", background: "rgba(250,248,243,0.8)", backdropFilter: "blur(14px) saturate(1.4)", borderBottom: "1px solid #E8E4DA" }}>
+      <nav style={{ position: "sticky", top: "0", zIndex: "40", background: "rgba(var(--c-bg-rgb),0.8)", backdropFilter: "blur(14px) saturate(1.4)", borderBottom: "1px solid var(--c-line)" }}>
         {' '}
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "24px" }}>
           {' '}
-          <button onClick={v.goLanding} style={{ display: "flex", alignItems: "center", gap: "10px", background: "none", border: "none", padding: "0", cursor: "pointer", color: "#18181B" }}>
+          <button onClick={v.goLanding} style={{ display: "flex", alignItems: "center", gap: "10px", background: "none", border: "none", padding: "0", cursor: "pointer", color: "var(--c-ink)" }}>
             {' '}
             <div style={{ position: "relative", width: "30px", height: "30px" }}>
               {' '}
@@ -47,10 +49,11 @@ export default function Shell({ v, children }) {
               {' '}
             </div>
             {' '}
+            {v.navTools}
             {v.signedOut ? (
               <>
                 {' '}
-                <button onClick={v.goAuth} style={{ padding: "9px 18px", borderRadius: "10px", border: "1px solid #D5D0C4", background: "transparent", color: "#18181B", fontSize: "14px", fontWeight: "500", cursor: "pointer", transition: "all .2s" }} className="dh61">
+                <button onClick={v.goAuth} style={{ padding: "9px 18px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "transparent", color: "var(--c-ink)", fontSize: "14px", fontWeight: "500", cursor: "pointer", transition: "all .2s" }} className="dh61">
                   Sign In
                 </button>
                 {' '}
@@ -66,7 +69,7 @@ export default function Shell({ v, children }) {
                     {v.userInitial}
                   </button>
                   {' '}
-                  <button onClick={v.signOut} style={{ padding: "8px 12px", borderRadius: "10px", border: "1px solid transparent", background: "transparent", color: "#5C5A55", fontSize: "14px", cursor: "pointer" }} className="dh62">
+                  <button onClick={v.signOut} style={{ padding: "8px 12px", borderRadius: "10px", border: "1px solid transparent", background: "transparent", color: "var(--c-text3)", fontSize: "14px", cursor: "pointer" }} className="dh62">
                     Sign out
                   </button>
                   {' '}
@@ -94,13 +97,13 @@ export default function Shell({ v, children }) {
               {' '}
               <div aria-hidden="true" style={{ position: "absolute", inset: "0", borderRadius: "14px", background: "#B42318", transform: "translate(8px,8px)" }}/>
               {' '}
-              <div style={{ position: "relative", background: "#FFFEFB", border: "1.5px solid #18181B", borderRadius: "14px", padding: "32px", display: "flex", flexDirection: "column", gap: "16px" }}>
+              <div style={{ position: "relative", background: "var(--c-paper)", border: "1.5px solid var(--c-ink)", borderRadius: "14px", padding: "32px", display: "flex", flexDirection: "column", gap: "16px" }}>
                 {' '}
                 <h3 style={{ margin: "0", fontSize: "22px", fontWeight: "600", letterSpacing: "-0.02em" }}>
                   Delete this listing?
                 </h3>
                 {' '}
-                <p style={{ margin: "0", fontSize: "15px", lineHeight: "1.6", color: "#3F3D38" }}>
+                <p style={{ margin: "0", fontSize: "15px", lineHeight: "1.6", color: "var(--c-text2)" }}>
                   <strong>
                     {v.delTitle}
                   </strong>
@@ -113,7 +116,7 @@ export default function Shell({ v, children }) {
                 {' '}
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", paddingTop: "8px" }}>
                   {' '}
-                  <button onClick={v.cancelDel} style={{ padding: "12px 18px", borderRadius: "10px", border: "1px solid #D5D0C4", background: "transparent", color: "#18181B", fontSize: "14px", fontWeight: "500", cursor: "pointer" }}>
+                  <button onClick={v.cancelDel} style={{ padding: "12px 18px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "transparent", color: "var(--c-ink)", fontSize: "14px", fontWeight: "500", cursor: "pointer" }}>
                     Cancel
                   </button>
                   {' '}
@@ -132,25 +135,7 @@ export default function Shell({ v, children }) {
         </>
       ) : null}
       {' '}
-      <footer style={{ position: "relative", overflow: "hidden", borderTop: "1px solid #E8E4DA" }}>
-        {' '}
-        <div aria-hidden="true" style={{ fontSize: "clamp(80px,17vw,230px)", fontWeight: "700", letterSpacing: "-0.06em", lineHeight: ".8", color: "transparent", WebkitTextStroke: "1.5px #E2DCCF", textAlign: "center", paddingTop: "40px", marginBottom: "-0.12em", userSelect: "none" }}>
-          devhire
-        </div>
-        {' '}
-        <div style={{ position: "relative", maxWidth: "1200px", margin: "0 auto", padding: "24px 32px 32px", display: "flex", justifyContent: "space-between", gap: "16px", flexWrap: "wrap", fontSize: "14px", color: "#75726A" }}>
-          {' '}
-          <span>
-            DevHire · developer jobs at Indian startups
-          </span>
-          {' '}
-          <span style={{ fontFamily: "'Geist Mono',monospace" }}>
-            © 2026
-          </span>
-          {' '}
-        </div>
-        {' '}
-      </footer>
+      <Footer v={v}/>
       {' '}
       {' '}
     </div>

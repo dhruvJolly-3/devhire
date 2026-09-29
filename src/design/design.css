@@ -1,7 +1,28 @@
 /* Global styles + keyframes from the Claude Design mockup. */
-html,body{margin:0;background:#FAF8F3;color:#18181B;font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+/* Colour tokens. Light is the design's palette; dark keeps the violet + lime
+   accents and flips the neutrals. <html data-theme="dark"> switches. */
+:root{
+  --c-ink:#18181B;--c-paper:#FFFEFB;--c-bg:#FAF8F3;--c-text2:#3F3D38;--c-text3:#5C5A55;--c-muted:#75726A;--c-faint:#A09D94;
+  --c-line:#E8E4DA;--c-line2:#D5D0C4;--c-sunk:#F1EEE5;--c-sunk2:#F0EBE1;--c-sand:#F1E6D2;--c-sand2:#F1E9DD;--c-sand3:#F6F1E7;
+  --c-stroke:#E2DCCF;--c-tint:#EEEBFF;--c-tint2:#F5F3FF;--c-tint3:#C9C2FB;--c-letter:#2A2721;
+  --c-accent-ink:#4438D9;--c-accent-text:#5B4FF5;--c-green:#0F6E56;--c-red:#B42318;--c-amber:#BA7517;
+  --c-bg-rgb:250,248,243;--c-paper-rgb:255,254,251;--c-img:none;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --c-ink:#F3F1EA;--c-paper:#1A191E;--c-bg:#111014;--c-text2:#D3CFC5;--c-text3:#ADA99E;--c-muted:#948F85;--c-faint:#6F6B63;
+  --c-line:#2B2930;--c-line2:#3B3842;--c-sunk:#222027;--c-sunk2:#25232A;--c-sand:#26231F;--c-sand2:#221F1C;--c-sand3:#1C1A1F;
+  --c-stroke:#2A2830;--c-tint:#25214A;--c-tint2:#1D1A36;--c-tint3:#4B44A0;--c-letter:#E6E2D8;
+  --c-accent-ink:#B1A9FF;--c-accent-text:#9D94FF;--c-green:#46C9A0;--c-red:#F2796C;--c-amber:#E7A94B;
+  --c-bg-rgb:17,16,20;--c-paper-rgb:26,25,30;--c-img:brightness(.82) saturate(.95);
+  color-scheme:dark;
+}
+/* Illustrations are drawn for a cream page; tone them down in the dark. */
+img[src^="/assets/"],[data-parallax],video{filter:var(--c-img)}
+html{transition:background-color .3s}
+html,body{margin:0;background:var(--c-bg);color:var(--c-ink);font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 *{box-sizing:border-box}
-a{color:#5B4FF5;text-decoration:none}a:hover{color:#4438D9}
+a{color:var(--c-accent-text);text-decoration:none}a:hover{color:var(--c-accent-ink)}
 input,textarea,select,button{font-family:inherit}
 ::selection{background:#D2F53B;color:#18181B}
 @keyframes dhPing{0%{transform:scale(1);opacity:.7}80%,100%{transform:scale(2.6);opacity:0}}
@@ -20,45 +41,45 @@ input,textarea,select,button{font-family:inherit}
 /* Hover / focus / active states (generated) */
 .dh0:hover{transform:translate(-2px,-2px) !important}
 .dh1:active{transform:translate(5px,5px) !important}
-.dh2:hover{color:#5B4FF5 !important}
-.dh3:focus{border-color:#5B4FF5 !important;background:#FFFEFB !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
-.dh4:focus{border-color:#5B4FF5 !important;background:#FFFEFB !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
-.dh5:focus{border-color:#5B4FF5 !important;background:#FFFEFB !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
+.dh2:hover{color:var(--c-accent-text) !important}
+.dh3:focus{border-color:#5B4FF5 !important;background:var(--c-paper) !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
+.dh4:focus{border-color:#5B4FF5 !important;background:var(--c-paper) !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
+.dh5:focus{border-color:#5B4FF5 !important;background:var(--c-paper) !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
 .dh6:hover{background:#4A3EE8 !important;box-shadow:0 10px 24px -8px rgba(91,79,245,0.6) !important}
 .dh7:hover{background:#4A3EE8 !important}
-.dh8:hover{border-color:#18181B !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #D2F53B !important}
-.dh9:hover{border-color:#18181B !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #D2F53B !important}
-.dh10:hover{border-color:#18181B !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #D2F53B !important}
-.dh11:hover{border-color:#18181B !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #5B4FF5 !important}
+.dh8:hover{border-color:var(--c-ink) !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #D2F53B !important}
+.dh9:hover{border-color:var(--c-ink) !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #D2F53B !important}
+.dh10:hover{border-color:var(--c-ink) !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #D2F53B !important}
+.dh11:hover{border-color:var(--c-ink) !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #5B4FF5 !important}
 .dh12:focus{border-color:#5B4FF5 !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
 .dh13:focus{border-color:#5B4FF5 !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
 .dh14:focus{border-color:#5B4FF5 !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
-.dh15:hover{transform:translate(-2px,-2px) !important;box-shadow:6px 6px 0 0 #18181B !important}
-.dh16:active{transform:translate(4px,4px) !important;box-shadow:0 0 0 0 #18181B !important}
-.dh17:hover{color:#5B4FF5 !important}
-.dh18:hover{border-color:#18181B !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #5B4FF5 !important}
-.dh19:hover{color:#5B4FF5 !important;text-decoration-color:#5B4FF5 !important}
-.dh20:hover{color:#18181B !important}
-.dh21:hover{color:#5B4FF5 !important;text-decoration-color:#5B4FF5 !important}
+.dh15:hover{transform:translate(-2px,-2px) !important;box-shadow:6px 6px 0 0 var(--c-ink) !important}
+.dh16:active{transform:translate(4px,4px) !important;box-shadow:0 0 0 0 var(--c-ink) !important}
+.dh17:hover{color:var(--c-accent-text) !important}
+.dh18:hover{border-color:var(--c-ink) !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #5B4FF5 !important}
+.dh19:hover{color:var(--c-accent-text) !important;text-decoration-color:#5B4FF5 !important}
+.dh20:hover{color:var(--c-ink) !important}
+.dh21:hover{color:var(--c-accent-text) !important;text-decoration-color:#5B4FF5 !important}
 .dh22:hover{transform:translate(-2px,-2px) !important}
 .dh23:active{transform:translate(4px,4px) !important}
 .dh24:hover{background:#5B4FF5 !important}
 .dh25:hover{background:#4A3EE8 !important}
-.dh26:hover{color:#5B4FF5 !important}
+.dh26:hover{color:var(--c-accent-text) !important}
 .dh27:hover{filter:brightness(1.08) !important}
-.dh28:hover{border-color:#18181B !important;color:#18181B !important}
-.dh29:hover{transform:translate(-2px,-2px) !important;box-shadow:6px 6px 0 0 #18181B !important}
-.dh30:hover{border-color:#18181B !important}
-.dh31:hover{border-color:#18181B !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #5B4FF5 !important}
-.dh32:hover{border-color:#18181B !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #5B4FF5 !important}
-.dh33:focus{border-color:#5B4FF5 !important;background:#FFFEFB !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
-.dh34:focus{border-color:#5B4FF5 !important;background:#FFFEFB !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
-.dh35:focus{border-color:#5B4FF5 !important;background:#FFFEFB !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
-.dh36:focus{border-color:#5B4FF5 !important;background:#FFFEFB !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
-.dh37:hover{border-color:#5B4FF5 !important;background:#F5F3FF !important}
-.dh38:focus{border-color:#5B4FF5 !important;background:#FFFEFB !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
-.dh39:hover{transform:translate(-2px,-2px) !important;box-shadow:6px 6px 0 0 #18181B !important}
-.dh40:active{transform:translate(4px,4px) !important;box-shadow:0 0 0 0 #18181B !important}
+.dh28:hover{border-color:var(--c-ink) !important;color:var(--c-ink) !important}
+.dh29:hover{transform:translate(-2px,-2px) !important;box-shadow:6px 6px 0 0 var(--c-ink) !important}
+.dh30:hover{border-color:var(--c-ink) !important}
+.dh31:hover{border-color:var(--c-ink) !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #5B4FF5 !important}
+.dh32:hover{border-color:var(--c-ink) !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #5B4FF5 !important}
+.dh33:focus{border-color:#5B4FF5 !important;background:var(--c-paper) !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
+.dh34:focus{border-color:#5B4FF5 !important;background:var(--c-paper) !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
+.dh35:focus{border-color:#5B4FF5 !important;background:var(--c-paper) !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
+.dh36:focus{border-color:#5B4FF5 !important;background:var(--c-paper) !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
+.dh37:hover{border-color:#5B4FF5 !important;background:var(--c-tint2) !important}
+.dh38:focus{border-color:#5B4FF5 !important;background:var(--c-paper) !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
+.dh39:hover{transform:translate(-2px,-2px) !important;box-shadow:6px 6px 0 0 var(--c-ink) !important}
+.dh40:active{transform:translate(4px,4px) !important;box-shadow:0 0 0 0 var(--c-ink) !important}
 .dh41:focus{border-color:#5B4FF5 !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
 .dh42:focus{border-color:#5B4FF5 !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
 .dh43:focus{border-color:#5B4FF5 !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
@@ -66,19 +87,99 @@ input,textarea,select,button{font-family:inherit}
 .dh45:focus{border-color:#5B4FF5 !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
 .dh46:focus{border-color:#5B4FF5 !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
 .dh47:focus{border-color:#5B4FF5 !important;box-shadow:0 0 0 4px rgba(91,79,245,0.14) !important}
-.dh48:hover{transform:translate(-2px,-2px) !important;box-shadow:6px 6px 0 0 #18181B !important}
-.dh49:active{transform:translate(4px,4px) !important;box-shadow:0 0 0 0 #18181B !important}
-.dh50:hover{border-color:#18181B !important}
+.dh48:hover{transform:translate(-2px,-2px) !important;box-shadow:6px 6px 0 0 var(--c-ink) !important}
+.dh49:active{transform:translate(4px,4px) !important;box-shadow:0 0 0 0 var(--c-ink) !important}
+.dh50:hover{border-color:var(--c-ink) !important}
 .dh51:hover{transform:translate(-2px,-2px) !important}
 .dh52:active{transform:translate(4px,4px) !important}
-.dh53:hover{border-color:#18181B !important}
-.dh54:hover{border-color:#18181B !important;color:#18181B !important}
-.dh55:hover{border-color:#5B4FF5 !important;color:#5B4FF5 !important}
+.dh53:hover{border-color:var(--c-ink) !important}
+.dh54:hover{border-color:var(--c-ink) !important;color:var(--c-ink) !important}
+.dh55:hover{border-color:#5B4FF5 !important;color:var(--c-accent-text) !important}
 .dh56:hover{border-color:rgba(180,35,24,0.4) !important;background:rgba(220,38,38,0.05) !important}
-.dh57:hover{border-color:#B42318 !important;color:#B42318 !important}
-.dh58:hover{color:#18181B !important}
-.dh59:hover{border-color:#18181B !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #5B4FF5 !important}
-.dh60:hover{color:#18181B !important}
-.dh61:hover{border-color:#5B4FF5 !important;color:#5B4FF5 !important;box-shadow:3px 3px 0 0 #5B4FF5 !important;transform:translate(-2px,-2px) !important}
-.dh62:hover{color:#18181B !important;border-color:#D5D0C4 !important}
+.dh57:hover{border-color:#B42318 !important;color:var(--c-red) !important}
+.dh58:hover{color:var(--c-ink) !important}
+.dh59:hover{border-color:var(--c-ink) !important;transform:translate(-4px,-4px) !important;box-shadow:6px 6px 0 0 #5B4FF5 !important}
+.dh60:hover{color:var(--c-ink) !important}
+.dh61:hover{border-color:#5B4FF5 !important;color:var(--c-accent-text) !important;box-shadow:3px 3px 0 0 #5B4FF5 !important;transform:translate(-2px,-2px) !important}
+.dh62:hover{color:var(--c-ink) !important;border-color:var(--c-line2) !important}
 .dh63:hover{background:#912018 !important}
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+.dh-foot{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:40px}
+@media (max-width:760px){.dh-foot{grid-template-columns:1fr;gap:32px;padding:40px 20px 120px!important}}
+.dh-foot-h{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--c-muted);margin-bottom:4px}
+.dh-foot-link{display:inline-flex;align-items:center;gap:10px;width:fit-content;padding:2px 0;background:none;border:none;cursor:pointer;font-size:15px;color:var(--c-text2);text-decoration:none;transition:color .15s,transform .2s}
+.dh-foot-link:hover{color:var(--c-accent-text);transform:translateX(3px)}
+.dh-foot-ico{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;border:1px solid var(--c-line2);background:var(--c-paper);color:var(--c-ink);transition:all .2s}
+.dh-foot-social:hover .dh-foot-ico{background:#5B4FF5;border-color:#5B4FF5;color:#FFFEFB;box-shadow:3px 3px 0 0 #D2F53B}
+.dh-foot-name{color:var(--c-ink);font-weight:500;text-decoration:underline;text-decoration-color:var(--c-line2);text-underline-offset:3px}
+.dh-foot-name:hover{color:var(--c-accent-text)}
+
+/* ── Nav tools: search + theme ─────────────────────────────────────────── */
+.dh-tool{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 10px;border-radius:10px;border:1px solid var(--c-line2);background:var(--c-paper);color:var(--c-text3);font-size:13px;cursor:pointer;transition:all .15s}
+.dh-tool:hover{border-color:var(--c-ink);color:var(--c-ink)}
+.dh-kbd{font-family:'Geist Mono',monospace;font-size:11px;padding:1px 5px;border-radius:5px;border:1px solid var(--c-line2);color:var(--c-muted)}
+@media (max-width:760px){.dh-tool-label,.dh-tool .dh-kbd{display:none}}
+.dh-theme svg{transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+.dh-theme:hover svg{transform:rotate(40deg)}
+
+/* ── Command palette ───────────────────────────────────────────────────── */
+.dh-cmd-back{position:fixed;inset:0;z-index:90;background:rgba(17,16,20,.38);backdrop-filter:blur(8px);display:flex;justify-content:center;align-items:flex-start;padding:12vh 16px 16px;animation:dhFade .18s ease}
+.dh-cmd{width:100%;max-width:600px;background:var(--c-paper);border:1.5px solid var(--c-ink);border-radius:16px;box-shadow:8px 8px 0 0 #5B4FF5;overflow:hidden;animation:dhPopIn .28s cubic-bezier(.22,1,.36,1)}
+.dh-cmd input{width:100%;border:none;outline:none;background:transparent;padding:18px 20px;font-size:17px;color:var(--c-ink);border-bottom:1px solid var(--c-line)}
+.dh-cmd-list{max-height:min(420px,55vh);overflow:auto;padding:8px}
+.dh-cmd-sec{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.08em;color:var(--c-muted);padding:10px 12px 6px;text-transform:uppercase}
+.dh-cmd-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:none;background:none;color:var(--c-ink);font-size:15px;cursor:pointer}
+.dh-cmd-item[aria-selected="true"]{background:var(--c-tint);color:var(--c-accent-ink)}
+.dh-cmd-sub{margin-left:auto;font-size:12px;color:var(--c-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%}
+.dh-cmd-foot{display:flex;gap:16px;padding:10px 16px;border-top:1px solid var(--c-line);font-size:12px;color:var(--c-muted)}
+
+/* ── Toasts ────────────────────────────────────────────────────────────── */
+.dh-toasts{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:95;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.dh-toast{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;background:var(--c-ink);color:var(--c-paper);font-size:14px;font-weight:500;box-shadow:0 12px 32px -12px rgba(0,0,0,.45);animation:dhToast .35s cubic-bezier(.22,1,.36,1)}
+.dh-toast b{color:#D2F53B}
+:root[data-theme="dark"] .dh-toast b{color:#5B4FF5}
+
+/* ── Back to top ───────────────────────────────────────────────────────── */
+.dh-top{position:fixed;right:24px;bottom:24px;z-index:70;width:46px;height:46px;border-radius:14px;border:1.5px solid var(--c-ink);background:#D2F53B;color:#18181B;font-size:18px;cursor:pointer;box-shadow:3px 3px 0 0 var(--c-ink);transition:opacity .25s,transform .25s}
+.dh-top[data-hidden="true"]{opacity:0;transform:translateY(16px);pointer-events:none}
+.dh-top:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 0 var(--c-ink)}
+
+/* ── Skeleton rows while jobs load ─────────────────────────────────────── */
+.dh-skel{height:132px;border-radius:14px;border:1px solid var(--c-line);background:linear-gradient(100deg,var(--c-paper) 30%,var(--c-sunk) 50%,var(--c-paper) 70%);background-size:300% 100%;animation:dhSkel 1.3s ease-in-out infinite}
+
+/* Scroll-reveal: elements start hidden only once JS has tagged them. */
+[data-reveal="wait"]{opacity:0;transform:translate3d(0,32px,0)}
+[data-reveal="in"]{opacity:1;transform:none;transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
+
+/* Cursor spotlight on cards (set --mx/--my from JS). */
+.dh-spot{position:relative;isolation:isolate}
+.dh-spot::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .25s;background:radial-gradient(360px circle at var(--mx,50%) var(--my,50%),rgba(91,79,245,.10),transparent 60%)}
+.dh-spot:hover::after{opacity:1}
+
+/* Theme switch: circular reveal via the View Transitions API. */
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+
+@keyframes dhFade{from{opacity:0}}
+@keyframes dhPopIn{from{opacity:0;transform:translateY(-8px) scale(.97)}}
+@keyframes dhToast{from{opacity:0;transform:translateY(12px) scale(.96)}}
+@keyframes dhSkel{from{background-position:100% 0}to{background-position:0 0}}
+
+/* ── Top loading bar ───────────────────────────────────────────────────── */
+.dh-loader{position:fixed;top:0;left:0;height:3px;width:100%;z-index:100;pointer-events:none;transform-origin:0 50%;background:linear-gradient(90deg,#5B4FF5,#D2F53B,#5B4FF5);background-size:200% 100%;box-shadow:0 0 12px rgba(91,79,245,.6);opacity:0;transform:scaleX(0)}
+.dh-loader[data-state="run"]{opacity:1;animation:dhLoad 2.2s cubic-bezier(.08,.8,.2,1) forwards,dhLoadShine 1s linear infinite}
+.dh-loader[data-state="end"]{opacity:0;transform:scaleX(1);transition:transform .2s ease,opacity .35s .15s ease}
+@keyframes dhLoad{0%{transform:scaleX(0)}100%{transform:scaleX(.88)}}
+@keyframes dhLoadShine{to{background-position:-200% 0}}
+
+/* ── Scroll smoothness ─────────────────────────────────────────────────── */
+/* Parallax layers move on the GPU; nothing else repaints while scrolling. */
+[data-parallax],[data-float]{will-change:transform;backface-visibility:hidden}
+/* Frosted nav is costly to repaint every frame; a lighter blur keeps 60fps. */
+nav[style*="sticky"]{backdrop-filter:blur(10px) saturate(1.3)!important;-webkit-backdrop-filter:blur(10px) saturate(1.3)!important;transform:translateZ(0)}
+/* The endless marquee and ambient loops get their own layers. */
+[style*="dhMarquee"],[style*="dhBlob"]{will-change:transform}
+/* Nested scroll areas stop at their edges instead of dragging the page. */
+.dh-cmd-list,textarea{overscroll-behavior:contain}
+html.lenis,html.lenis body{height:auto}
+@media (prefers-reduced-motion: reduce){[data-reveal]{opacity:1!important;transform:none!important}}
