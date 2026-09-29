@@ -23,7 +23,7 @@ export default function ProfilePage({ v, inputRef }) {
               {' '}
               <div style={{ position: "absolute", inset: "0", borderRadius: "50%", background: "#5B4FF5", transform: "translate(4px,4px)" }}/>
               {' '}
-              <div style={{ position: "absolute", inset: "0", borderRadius: "50%", background: "#D2F53B", border: "1.5px solid var(--c-ink)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "34px", fontWeight: "600" }}>
+              <div style={{ position: "absolute", inset: "0", borderRadius: "50%", background: "#D2F53B", color: "#18181B", border: "1.5px solid var(--c-ink)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "34px", fontWeight: "600" }}>
                 {v.userInitial}
               </div>
               {' '}

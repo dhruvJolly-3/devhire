@@ -32,7 +32,7 @@ export default function LandingPage({ v }) {
                 Land your next tech role with instant,{' '}
                 <span style={{ position: "relative", display: "inline-block" }}>
                   <span style={{ position: "absolute", inset: "6% -6px 2% -6px", background: "#D2F53B", borderRadius: "10px", transform: "rotate(-1.5deg)" }}/>
-                  <span style={{ position: "relative" }}>
+                  <span style={{ position: "relative", color: "#18181B" }}>
                     AI-tailored
                   </span>
                 </span>

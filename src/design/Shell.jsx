@@ -12,7 +12,7 @@ export default function Shell({ v, children }) {
       {' '}
       <nav style={{ position: "sticky", top: "0", zIndex: "40", background: "rgba(var(--c-bg-rgb),0.8)", backdropFilter: "blur(14px) saturate(1.4)", borderBottom: "1px solid var(--c-line)" }}>
         {' '}
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "24px" }}>
+        <div data-nav="bar" style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "24px" }}>
           {' '}
           <button onClick={v.goLanding} style={{ display: "flex", alignItems: "center", gap: "10px", background: "none", border: "none", padding: "0", cursor: "pointer", color: "var(--c-ink)" }}>
             {' '}
@@ -32,9 +32,9 @@ export default function Shell({ v, children }) {
             {' '}
           </button>
           {' '}
-          <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
+          <div data-nav="right" style={{ display: "flex", alignItems: "center", gap: "24px" }}>
             {' '}
-            <div style={{ display: "flex", gap: "4px" }}>
+            <div data-nav="links" style={{ display: "flex", gap: "4px" }}>
               {' '}
               {(v.navItems || []).map((n, i0) => (
                 <Fragment key={n?.id ?? i0}>
@@ -50,6 +50,7 @@ export default function Shell({ v, children }) {
             </div>
             {' '}
             {v.navTools}
+            {v.menuButton}
             {v.signedOut ? (
               <>
                 {' '}
@@ -69,7 +70,7 @@ export default function Shell({ v, children }) {
                     {v.userInitial}
                   </button>
                   {' '}
-                  <button onClick={v.signOut} style={{ padding: "8px 12px", borderRadius: "10px", border: "1px solid transparent", background: "transparent", color: "var(--c-text3)", fontSize: "14px", cursor: "pointer" }} className="dh62">
+                  <button data-nav="signout" onClick={v.signOut} style={{ padding: "8px 12px", borderRadius: "10px", border: "1px solid transparent", background: "transparent", color: "var(--c-text3)", fontSize: "14px", cursor: "pointer" }} className="dh62">
                     Sign out
                   </button>
                   {' '}

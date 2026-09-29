@@ -49,7 +49,7 @@ export default function AuthPage({ v }) {
               {v.authNotice ? (
                 <>
                   {' '}
-                  <div style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", lineHeight: "1.5", color: "var(--c-ink)", background: "rgba(210,245,59,0.35)", border: "1px solid #D2F53B", borderRadius: "10px", padding: "10px 14px" }}>
+                  <div style={{ fontFamily: "'Geist Mono',monospace", fontSize: "12px", lineHeight: "1.5", color: "#18181B", background: "#E6FA8F", border: "1px solid #D2F53B", borderRadius: "10px", padding: "10px 14px" }}>
                     {v.authNotice}
                   </div>
                   {' '}

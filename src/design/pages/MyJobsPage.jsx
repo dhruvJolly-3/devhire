@@ -33,11 +33,11 @@ export default function MyJobsPage({ v }) {
               </span>
             </div>
             {' '}
-            <div style={{ padding: "14px 18px", borderRadius: "12px", background: "#D2F53B", border: "1.5px solid var(--c-ink)", boxShadow: "3px 3px 0 0 var(--c-ink)", display: "flex", flexDirection: "column", gap: "2px", minWidth: "96px" }}>
+            <div style={{ padding: "14px 18px", borderRadius: "12px", background: "#D2F53B", color: "#18181B", border: "1.5px solid var(--c-ink)", boxShadow: "3px 3px 0 0 var(--c-ink)", display: "flex", flexDirection: "column", gap: "2px", minWidth: "96px" }}>
               <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: "24px", fontWeight: "500" }}>
                 {v.appliedCount}
               </span>
-              <span style={{ fontSize: "13px", color: "var(--c-ink)" }}>
+              <span style={{ fontSize: "13px", color: "#3F3D38" }}>
                 Applied
               </span>
             </div>

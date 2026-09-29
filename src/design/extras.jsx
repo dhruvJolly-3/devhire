@@ -1,5 +1,6 @@
 // Site-wide UI: nav tools (search + theme), command palette, toasts, back-to-top.
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const Sun = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
@@ -127,4 +128,39 @@ export function TopLoader() {
     return () => { window.removeEventListener('dh:busy', on); clearTimeout(hide); };
   }, []);
   return <div className="dh-loader" data-state={pending > 0 ? 'run' : done ? 'idle' : 'end'} aria-hidden="true"/>;
+}
+
+// Hamburger + slide-in sheet for narrow screens. Rendered into <body>: the
+// nav's backdrop-filter would otherwise trap position:fixed inside it.
+// `items` = [{ label, current, onClick }]
+export function MobileMenu({ items }) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === 'Escape' && setOpen(false);
+    window.addEventListener('keydown', onKey);
+    window.__lenis?.stop();
+    return () => { window.removeEventListener('keydown', onKey); window.__lenis?.start(); };
+  }, [open]);
+  return (
+    <>
+      <button className="dh-burger" aria-label="Open menu" aria-expanded={open} onClick={() => setOpen(true)}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      {open && createPortal(
+        <>
+          <div className="dh-sheet-back" onClick={() => setOpen(false)}/>
+          <nav className="dh-sheet" aria-label="Menu">
+            <button aria-label="Close menu" onClick={() => setOpen(false)} style={{ justifyContent: 'flex-end', fontSize: 22 }}>✕</button>
+            {items.map(it => it.divider ? <hr key={it.label}/> : (
+              <button key={it.label} aria-current={it.current ? 'page' : undefined} onClick={() => { setOpen(false); it.onClick(); }}>
+                {it.label}<span aria-hidden="true" style={{ opacity: 0.4 }}>→</span>
+              </button>
+            ))}
+          </nav>
+        </>,
+        document.body,
+      )}
+    </>
+  );
 }

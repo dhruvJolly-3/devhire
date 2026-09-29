@@ -11,7 +11,7 @@ import ProfilePage from './design/pages/ProfilePage';
 import PostJobPage from './design/pages/PostJobPage';
 import DashboardPage from './design/pages/DashboardPage';
 import CompanyPage from './design/pages/CompanyPage';
-import { NavTools, CommandPalette, Toasts, BackToTop, SkeletonList, TopLoader } from './design/extras';
+import { NavTools, CommandPalette, Toasts, BackToTop, SkeletonList, TopLoader, MobileMenu } from './design/extras';
 import { Marquee, Shimmer, LiveDot, Spinner, MatchRing, LetterBox, BgVideo } from './design/ambient';
 import useJobs from './hooks/useJobs';
 import useMyJobs from './hooks/useMyJobs';
@@ -209,11 +209,14 @@ export default function App() {
   const signOut = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    // Switch to the login URL in the same render as clearing the user, so the
+    // page being left (e.g. the dashboard) doesn't redirect to login?next=….
+    window.history.pushState(null, '', '#/login');
+    setLocation(parseHash());
     setUser(null);
     setAi({});
     setPfDraft(null);
     toast('Signed out', '→');
-    go('/login');
   };
 
   // ── Shared job decoration ────────────────────────────────────────────────
@@ -442,6 +445,11 @@ export default function App() {
     goLanding: () => go(user ? '/jobs' : '/'), goHome: () => go('/jobs'), goPost: () => go('/post'),
     goAuth: () => go('/login'), goProfile: () => go('/profile'), goMe: () => go('/me'),
     signOut,
+    menuButton: <MobileMenu items={[
+      ...nav.map(([k, label, path]) => ({ label, current: navPage === k, onClick: () => go(path) })),
+      { label: '—', divider: true },
+      ...(user ? [{ label: 'Your profile', current: page === 'profile', onClick: () => go('/profile') }, { label: 'Sign out', onClick: signOut }] : [{ label: 'Sign in', onClick: () => go('/login') }, { label: 'Create an account', onClick: () => go('/register') }]),
+    ]}/>,
     navTools: <NavTools dark={theme.dark} onToggleTheme={theme.toggle} onSearch={() => { setCmdQuery(''); setCmdOpen(true); }}/>,
 
     // Landing
