@@ -1,14 +1,14 @@
 # DevHire
 
-Full-stack job board for developer roles at Indian startups. Candidates browse live jobs, upload a resume and get an AI match score and a tailored cover letter for every role. Employers post openings and review applicants, ranked by fit.
+Full-stack job board for developer roles at Indian startups. Candidates browse live jobs, upload a resume and get a match score and a tailored cover letter for every role. Employers post openings and review applicants, ranked by fit.
 
 **Live demo:** https://devhire-neon.vercel.app
 
 ![DevHire landing page](public/screenshots/landing-light.png)
 
-| Dark mode | AI match score |
+| Dark mode | Match score |
 |---|---|
-| ![Landing page in dark mode](public/screenshots/landing-dark.png) | ![AI match score and cover letter](public/screenshots/job-detail-ai.png) |
+| ![Landing page in dark mode](public/screenshots/landing-dark.png) | ![Match score and cover letter](public/screenshots/job-detail-ai.png) |
 
 | Job board | Employer dashboard |
 |---|---|
@@ -21,7 +21,7 @@ Full-stack job board for developer roles at Indian startups. Candidates browse l
 | Frontend | React 19, Vite, hash routing, Lenis smooth scrolling, inline-styled design system with light/dark tokens (`src/design`) |
 | Backend | Node.js, Express, MongoDB Atlas, Mongoose |
 | Auth | JWT, bcrypt |
-| AI | Anthropic Claude API (`@anthropic-ai/sdk`) |
+| Match score & letters | LLM API (Anthropic SDK), structured JSON output |
 | Jobs data | Adzuna India API, Greenhouse career feeds |
 | Deploy | Vercel (frontend) · Render (backend) |
 
@@ -30,9 +30,9 @@ Full-stack job board for developer roles at Indian startups. Candidates browse l
 ### For candidates
 - **Live job feed:** developer jobs across Indian cities, imported from Adzuna and Greenhouse, deduplicated in MongoDB and tagged with their source.
 - **Job board:** search, filters (work type, city, stack), sorting (newest, salary, company) and pagination.
-- **AI match score:** a 0–100 fit score for each job, with strengths and gaps based on your resume.
-- **AI cover letters:** written from your resume and the job description, ready to copy.
-- **Profile:** upload a PDF or text resume; its text is extracted on the server and powers the AI features.
+- **Match score:** a 0–100 fit score for each job, with strengths and gaps based on your resume.
+- **Cover letters:** drafted from your resume and the job description, ready to edit and copy.
+- **Profile:** upload a PDF or text resume; its text is extracted on the server and used for match scores and letters.
 - **My jobs:** save jobs and track the ones you applied to.
 - **Company pages:** every open role at a company, with a short profile.
 
@@ -71,7 +71,7 @@ PORT=5001
 MONGODB_URI=your_mongodb_atlas_uri
 JWT_SECRET=your_jwt_secret
 CORS_ORIGINS=https://your-frontend-domain   # comma-separated, no trailing slash
-ANTHROPIC_API_KEY=your_anthropic_api_key    # enables the AI match score and cover letters
+ANTHROPIC_API_KEY=your_anthropic_api_key    # enables match scores and cover letters
 ADZUNA_APP_ID=your_adzuna_app_id            # free key from developer.adzuna.com
 ADZUNA_APP_KEY=your_adzuna_app_key
 # Optional
@@ -130,7 +130,7 @@ server/
 - [x] Job listings, filters, search, detail pages
 - [x] Post, edit and delete jobs
 - [x] Live India job feed (Adzuna, Greenhouse)
-- [x] AI match score and cover letters (Anthropic Claude API)
+- [x] Match score and cover letters
 - [x] Saved / applied jobs, profile with resume upload
 - [x] Employer dashboard with ranked applicants
 - [x] Company pages
