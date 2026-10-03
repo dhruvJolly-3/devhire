@@ -4,6 +4,8 @@ Full-stack job board for developer roles at Indian startups. Candidates browse l
 
 **Live demo:** https://devhire-neon.vercel.app
 
+> **No sign-up needed:** on the sign-in page, choose **Try the demo → As a company** to see a hiring dashboard with applicants ranked by match score, or **As a candidate** to see saved and applied jobs with a filled-in profile.
+
 ![DevHire landing page](public/screenshots/landing-light.png)
 
 | Dark mode | Match score |
@@ -41,6 +43,11 @@ Full-stack job board for developer roles at Indian startups. Candidates browse l
 - **Company accounts:** a hiring team signs in with its own **Company ID** (e.g. `zepto-hiring`) and password.
 - Post, edit and delete your own listings; roles are always posted under the company's name (checked on the server).
 - A dashboard with applicant counts, applicants ranked by match score, and shortlist / reject.
+
+### Demo accounts
+- One-click demo company and demo candidate (`POST /api/auth/demo`), so reviewers can explore both sides without creating data.
+- A server-side seeder (`server/services/demo.js`) creates the demo company, listings, applicants and their match scores through the same models and scoring as the real app. It is idempotent: it repairs anything a visitor deleted and keeps their shortlist / reject changes.
+- Demo accounts have random passwords and can only be entered through the demo button. Set `DEMO=off` to disable it, or run `npm run seed:demo` in `server/` to create the data up front.
 
 ### Access control
 - Two account types, enforced by the API: company accounts post and review applicants; candidates save, apply and get match scores.
@@ -121,6 +128,7 @@ server/
 | POST | `/api/auth/company/register` | — | Create a company account with a Company ID |
 | POST | `/api/auth/company/login` | — | Company log in with Company ID + password |
 | GET | `/api/auth/me` | ✓ | The signed-in account (role, company) |
+| POST | `/api/auth/demo` | — | Sign into the demo company or demo candidate (`{ as: 'company' \| 'candidate' }`) |
 | GET | `/api/jobs` | — | All jobs (`?source=devhire` or `?source=external` to filter) |
 | GET | `/api/jobs/:id` | — | One job |
 | POST | `/api/jobs` | ✓ company | Create a job |

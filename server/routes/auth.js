@@ -5,6 +5,7 @@ const User = require('../models/User');
 const auth = require('../middleware/auth');
 const rateLimit = require('../middleware/rateLimit');
 const { isCompany } = require('../utils/roles');
+const { ensureDemo } = require('../services/demo');
 
 const MIN = 60 * 1000;
 const lower = (s) => String(s || '').trim().toLowerCase();
@@ -23,6 +24,7 @@ const publicUser = (u) => ({
   id: u._id, name: u.name, email: u.email, role: u.role,
   company: u.company || '', companyId: u.companyId || '', avatar: u.avatar || '',
   isCompany: isCompany(u),
+  isDemo: /@devhire\.demo$/.test(u.email || ''),
 });
 const authPayload = (u) => ({ token: sign(u._id), user: publicUser(u) });
 
@@ -141,6 +143,20 @@ router.post('/company/login', loginLimit, async (req, res) => {
       return res.status(401).json({ message: 'Invalid Company ID or password' });
     }
     res.json(authPayload(user));
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// ── Demo ────────────────────────────────────────────────────────────────────
+// POST /api/auth/demo { as: 'company' | 'candidate' } → signs into a ready-made
+// demo account (see services/demo.js). DEMO=off disables it.
+const demoLimit = rateLimit({ windowMs: 15 * MIN, max: 30, key: (req) => `demo:${req.ip}` });
+router.post('/demo', demoLimit, async (req, res) => {
+  if (process.env.DEMO === 'off') return res.status(404).json({ message: 'Demo is turned off' });
+  try {
+    const { company, candidate } = await ensureDemo();
+    res.json(authPayload(req.body.as === 'company' ? company : candidate));
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

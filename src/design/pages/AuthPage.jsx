@@ -149,6 +149,7 @@ export default function AuthPage({ v }) {
               {' '}
             </form>
             {v.googleButton}
+            {v.demoBox}
             {' '}
           </div>
           {' '}

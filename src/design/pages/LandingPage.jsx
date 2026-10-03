@@ -138,6 +138,7 @@ export default function LandingPage({ v }) {
                       {' '}
                     </form>
                     {v.googleButton}
+                    {v.demoBox}
                     <button type="button" onClick={v.goCompanyLogin} style={{ alignSelf: "center", background: "none", border: "none", padding: "0", fontSize: "13px", color: "var(--c-text3)", cursor: "pointer" }} className="dh2">
                       Hiring? <span style={{ color: "var(--c-accent-text)", fontWeight: 500 }}>Sign in with your Company ID →</span>
                     </button>

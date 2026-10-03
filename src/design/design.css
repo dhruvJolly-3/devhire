@@ -198,3 +198,6 @@ html.lenis,html.lenis body{height:auto}
 .dh-sheet button[aria-current="page"]{background:var(--c-tint);color:var(--c-accent-ink)}
 .dh-sheet hr{border:none;border-top:1px solid var(--c-line);margin:10px 0;width:100%}
 @keyframes dhSlide{from{transform:translateX(100%)}}
+
+/* Demo buttons */
+.dh-demo:hover:not(:disabled){border-style:solid!important;border-color:#5B4FF5!important;background:var(--c-tint)!important}

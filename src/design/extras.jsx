@@ -164,3 +164,36 @@ export function MobileMenu({ items }) {
     </>
   );
 }
+
+// "Try the demo" box: one click signs into a ready-made demo company or
+// candidate (server: POST /api/auth/demo), so nobody has to set up data first.
+export function DemoBox({ onTry, busy }) {
+  const btn = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, padding: '10px 12px', borderRadius: 10, border: '1px dashed var(--c-line2)', background: 'var(--c-sunk)', color: 'var(--c-ink)', cursor: busy ? 'wait' : 'pointer', textAlign: 'left', transition: 'all .15s' };
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 4 }}>
+      <span style={{ fontFamily: "'Geist Mono',monospace", fontSize: 11, letterSpacing: '0.08em', color: 'var(--c-muted)', textAlign: 'center' }}>
+        JUST LOOKING? TRY THE DEMO — NO SIGN-UP
+      </span>
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button type="button" className="dh-demo" style={btn} disabled={busy} onClick={() => onTry('company')}>
+          <span style={{ fontSize: 14, fontWeight: 600 }}>🏢 As a company</span>
+          <span style={{ fontSize: 12, color: 'var(--c-text3)' }}>Ranked applicants</span>
+        </button>
+        <button type="button" className="dh-demo" style={btn} disabled={busy} onClick={() => onTry('candidate')}>
+          <span style={{ fontSize: 14, fontWeight: 600 }}>👩‍💻 As a candidate</span>
+          <span style={{ fontSize: 12, color: 'var(--c-text3)' }}>Saved & applied jobs</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Small badge while signed into a demo account.
+export function DemoBadge({ label, onLeave }) {
+  return (
+    <div role="status" style={{ position: 'fixed', left: 16, bottom: 16, zIndex: 70, display: 'flex', alignItems: 'center', gap: 10, padding: '8px 8px 8px 14px', borderRadius: 999, background: '#D2F53B', color: '#18181B', border: '1.5px solid #18181B', boxShadow: '3px 3px 0 0 #18181B', fontSize: 13, fontWeight: 500 }}>
+      <span>Demo · {label}</span>
+      <button type="button" onClick={onLeave} style={{ border: 'none', borderRadius: 999, padding: '4px 10px', background: '#18181B', color: '#FFFEFB', fontSize: 12, cursor: 'pointer' }}>Exit demo</button>
+    </div>
+  );
+}

@@ -27,7 +27,7 @@ export function resolveRoute({ parts, query }, user) {
   if (!first) return user ? { redirect: user.isCompany ? '/dashboard' : '/jobs' } : { page: 'landing' };
   if (first === 'login' || first === 'register') {
     // Already signed in: go where they were heading, else their home page.
-    if (user) return { redirect: query.get('next') || (user.isCompany ? '/dashboard' : '/jobs') };
+    if (user) return { redirect: query.get('next') || (user.isCompany ? '/dashboard' : user.isDemo ? '/me' : '/jobs') };
     return { page: 'auth', mode: first, next: query.get('next') || '', as: query.get('as') === 'company' ? 'company' : 'candidate' };
   }
   if (first === 'jobs' && second) return { page: 'detail', jobId: second };

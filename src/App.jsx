@@ -11,7 +11,7 @@ import ProfilePage from './design/pages/ProfilePage';
 import PostJobPage from './design/pages/PostJobPage';
 import DashboardPage from './design/pages/DashboardPage';
 import CompanyPage from './design/pages/CompanyPage';
-import { NavTools, CommandPalette, Toasts, BackToTop, SkeletonList, TopLoader, MobileMenu } from './design/extras';
+import { NavTools, CommandPalette, Toasts, BackToTop, SkeletonList, TopLoader, MobileMenu, DemoBox, DemoBadge } from './design/extras';
 import GoogleButton from './design/GoogleButton';
 import { Marquee, Shimmer, LiveDot, Spinner, MatchRing, LetterBox, BgVideo } from './design/ambient';
 import useJobs from './hooks/useJobs';
@@ -221,8 +221,11 @@ export default function App() {
     setAuthError('');
     setUser(data.user);
     const first = data.user.isCompany ? data.user.company : data.user.name.split(' ')[0];
-    toast(`Welcome${isNew ? '' : ' back'}, ${first}`, '👋');
-    replace(route.next || (data.user.isCompany ? '/dashboard' : '/jobs'));
+    if (data.user.isDemo) toast(data.user.isCompany ? 'Demo company: applicants are ranked by match score' : 'Demo candidate: see your saved & applied jobs', '👀');
+    else toast(`Welcome${isNew ? '' : ' back'}, ${first}`, '👋');
+    // Demo candidates land on My jobs, so there's something to see straight away.
+    const home = data.user.isCompany ? '/dashboard' : data.user.isDemo ? '/me' : '/jobs';
+    replace(route.next || home);
   };
 
   // Client-side checks mirror the server's, so most mistakes show instantly.
@@ -262,6 +265,20 @@ export default function App() {
       finishAuth(res.data, isReg);
     } catch (err) {
       setAuthError(errMsg(err, 'Could not reach the server. Is the backend running?'));
+    } finally {
+      setAuthBusy(false);
+    }
+  };
+
+  // Demo: one click into a ready-made company or candidate account.
+  const tryDemo = async (as) => {
+    setAuthBusy(true);
+    setAuthError('');
+    try {
+      const res = await api.post('/auth/demo', { as });
+      finishAuth(res.data, false);
+    } catch (err) {
+      setAuthError(errMsg(err, 'The demo is unavailable right now.'));
     } finally {
       setAuthBusy(false);
     }
@@ -563,6 +580,7 @@ export default function App() {
     ],
     googleButton: asCompany ? null : <GoogleButton dark={theme.dark} text={isReg ? 'signup_with' : 'continue_with'} onCredential={onGoogle} onError={setAuthError}/>,
     goCompanyLogin: () => go('/login?as=company'),
+    demoBox: <DemoBox onTry={tryDemo} busy={authBusy}/>,
     isRegister: isReg, authForm, authError,
     authNotice: route.next ? (nextJob ? `Sign in to continue with ${nextJob.title} at ${nextJob.company}.` : 'Sign in to continue — we’ll take you straight back.') : '',
     authSwitchPre: isReg ? 'Already have an account? ' : 'New to DevHire? ', authSwitchLink: isReg ? 'Sign in' : 'Create an account',
@@ -730,6 +748,7 @@ export default function App() {
       <TopLoader/>
       <Toasts toasts={toasts}/>
       <BackToTop/>
+      {user?.isDemo ? <DemoBadge label={user.isCompany ? `${user.company} (company)` : 'candidate'} onLeave={signOut}/> : null}
     </>
   );
 }
