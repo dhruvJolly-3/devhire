@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const Anthropic = require('@anthropic-ai/sdk');
 const auth = require('../middleware/auth');
+const { requireApplicant } = require('../utils/roles');
 const Job = require('../models/Job');
 
 // Reads ANTHROPIC_API_KEY from the environment.
@@ -64,7 +65,7 @@ async function askClaude({ system, prompt, format }) {
 }
 
 // POST /api/ai/match/:jobId  { resume } → { score, summary, strengths, gaps }
-router.post('/match/:jobId', auth, async (req, res) => {
+router.post('/match/:jobId', auth, requireApplicant, async (req, res) => {
   try {
     const data = await loadJobAndResume(req, res);
     if (!data) return;
@@ -98,7 +99,7 @@ router.post('/match/:jobId', auth, async (req, res) => {
 });
 
 // POST /api/ai/cover-letter/:jobId  { resume } → { letter }
-router.post('/cover-letter/:jobId', auth, async (req, res) => {
+router.post('/cover-letter/:jobId', auth, requireApplicant, async (req, res) => {
   try {
     const data = await loadJobAndResume(req, res);
     if (!data) return;

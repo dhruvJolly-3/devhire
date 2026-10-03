@@ -20,7 +20,7 @@ Full-stack job board for developer roles at Indian startups. Candidates browse l
 |---|---|
 | Frontend | React 19, Vite, hash routing, Lenis smooth scrolling, inline-styled design system with light/dark tokens (`src/design`) |
 | Backend | Node.js, Express, MongoDB Atlas, Mongoose |
-| Auth | JWT, bcrypt |
+| Auth | JWT, bcrypt, Google Sign-In (Google Identity Services), role-based access, rate-limited logins |
 | Match score & letters | LLM API (Anthropic SDK), structured JSON output |
 | Jobs data | Adzuna India API, Greenhouse career feeds |
 | Deploy | Vercel (frontend) · Render (backend) |
@@ -28,6 +28,7 @@ Full-stack job board for developer roles at Indian startups. Candidates browse l
 ## Features
 
 ### For candidates
+- **Sign in with Google** in one click, or with email and password.
 - **Live job feed:** developer jobs across Indian cities, imported from Adzuna and Greenhouse, deduplicated in MongoDB and tagged with their source.
 - **Job board:** search, filters (work type, city, stack), sorting (newest, salary, company) and pagination.
 - **Match score:** a 0–100 fit score for each job, with strengths and gaps based on your resume.
@@ -37,8 +38,13 @@ Full-stack job board for developer roles at Indian startups. Candidates browse l
 - **Company pages:** every open role at a company, with a short profile.
 
 ### For employers
-- Post, edit and delete your own listings (ownership is checked on the server).
+- **Company accounts:** a hiring team signs in with its own **Company ID** (e.g. `zepto-hiring`) and password.
+- Post, edit and delete your own listings; roles are always posted under the company's name (checked on the server).
 - A dashboard with applicant counts, applicants ranked by match score, and shortlist / reject.
+
+### Access control
+- Two account types, enforced by the API: company accounts post and review applicants; candidates save, apply and get match scores.
+- Login and sign-up endpoints are rate-limited against password guessing.
 
 ### Interface
 - Light and dark mode: follows the OS setting, remembers your choice, and switches with a circular reveal animation.
@@ -72,6 +78,7 @@ MONGODB_URI=your_mongodb_atlas_uri
 JWT_SECRET=your_jwt_secret
 CORS_ORIGINS=https://your-frontend-domain   # comma-separated, no trailing slash
 ANTHROPIC_API_KEY=your_anthropic_api_key    # enables match scores and cover letters
+GOOGLE_CLIENT_ID=your_google_client_id      # enables “Sign in with Google” (same as VITE_GOOGLE_CLIENT_ID)
 ADZUNA_APP_ID=your_adzuna_app_id            # free key from developer.adzuna.com
 ADZUNA_APP_KEY=your_adzuna_app_key
 # Optional
@@ -85,7 +92,10 @@ GREENHOUSE_BOARDS=                          # "board:Company Name,..." career fe
 
 ```bash
 VITE_API_URL=http://localhost:5001/api
+VITE_GOOGLE_CLIENT_ID=your_google_client_id   # optional; the Google button only shows when set
 ```
+
+**Setting up Google sign-in:** in [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials), create an *OAuth client ID* of type *Web application*. Add your site URLs (e.g. `http://localhost:5173` and your Vercel URL) under *Authorized JavaScript origins*. Use the client ID for both `GOOGLE_CLIENT_ID` (server) and `VITE_GOOGLE_CLIENT_ID` (frontend).
 
 ## Project structure
 
@@ -105,11 +115,15 @@ server/
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| POST | `/api/auth/register` | — | Create account |
-| POST | `/api/auth/login` | — | Log in, returns a JWT |
+| POST | `/api/auth/register` | — | Create a candidate account |
+| POST | `/api/auth/login` | — | Candidate log in, returns a JWT |
+| POST | `/api/auth/google` | — | Candidate sign-in with a Google ID token |
+| POST | `/api/auth/company/register` | — | Create a company account with a Company ID |
+| POST | `/api/auth/company/login` | — | Company log in with Company ID + password |
+| GET | `/api/auth/me` | ✓ | The signed-in account (role, company) |
 | GET | `/api/jobs` | — | All jobs (`?source=devhire` or `?source=external` to filter) |
 | GET | `/api/jobs/:id` | — | One job |
-| POST | `/api/jobs` | ✓ | Create a job |
+| POST | `/api/jobs` | ✓ company | Create a job |
 | PUT | `/api/jobs/:id` | ✓ | Update your own job |
 | DELETE | `/api/jobs/:id` | ✓ | Delete your own job (and its applications) |
 | POST | `/api/ai/match/:jobId` | ✓ | Resume vs job match score |

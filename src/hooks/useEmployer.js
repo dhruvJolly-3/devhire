@@ -11,6 +11,10 @@ export default function useEmployer(user, enabled) {
     try { setListings((await api.get('/employer/jobs')).data); } catch { setListings([]); } finally { setLoaded(true); }
   }, []);
 
+  // Fresh listings + applicants: called each time the dashboard opens, so
+  // applications that arrived since the last visit show up.
+  const refresh = useCallback(() => { setApplicants({}); load(); }, [load]);
+
   const loadApplicants = useCallback(async (jobId) => {
     try {
       const res = await api.get(`/employer/jobs/${jobId}/applicants`);
@@ -40,5 +44,5 @@ export default function useEmployer(user, enabled) {
     setListings(l => l.filter(j => j._id !== jobId));
   };
 
-  return { listings: user ? listings : [], applicants, loaded, reload: load, loadApplicants, setStatus, remove };
+  return { listings: user ? listings : [], applicants, loaded, reload: load, refresh, loadApplicants, setStatus, remove };
 }

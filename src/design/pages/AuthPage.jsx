@@ -32,6 +32,14 @@ export default function AuthPage({ v }) {
               {' '}
             </div>
             {' '}
+            <div role="tablist" aria-label="Account type" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+              {(v.roleTabs || []).map(t => (
+                <button key={t.key} role="tab" aria-selected={t.on} onClick={t.onClick} style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "2px", padding: "12px 14px", borderRadius: "12px", border: t.on ? "1.5px solid var(--c-ink)" : "1px solid var(--c-line2)", background: t.on ? "var(--c-tint)" : "var(--c-paper)", boxShadow: t.on ? "3px 3px 0 0 #5B4FF5" : "none", cursor: "pointer", textAlign: "left", transition: "all .15s" }}>
+                  <span style={{ fontSize: "15px", fontWeight: "600", color: "var(--c-ink)" }}>{t.icon} {t.label}</span>
+                  <span style={{ fontSize: "12px", color: "var(--c-text3)" }}>{t.sub}</span>
+                </button>
+              ))}
+            </div>
             <div style={{ display: "flex", padding: "4px", borderRadius: "12px", background: "var(--c-sunk)", border: "1px solid var(--c-line)" }}>
               {' '}
               <button onClick={v.setLogin} style={{ flex: "1", padding: "10px", borderRadius: "9px", border: "none", cursor: "pointer", fontSize: "14px", fontWeight: "500", background: v.loginTabBg, color: v.loginTabFg, boxShadow: v.loginTabShadow, transition: "all .2s" }}>
@@ -66,6 +74,41 @@ export default function AuthPage({ v }) {
                 </>
               ) : null}
               {' '}
+              {v.isCompanyAuth ? (
+                <>
+                  {v.isRegister ? (
+                    <>
+                      <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "var(--c-text2)" }}>
+                        Company name
+                        <input name="company" value={v.authForm.company} onChange={v.onAuthField} placeholder="Zepto" autoComplete="organization" style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-paper)", fontSize: "15px", color: "var(--c-ink)", outline: "none", transition: "all .2s" }} className="dh12"/>
+                      </label>
+                    </>
+                  ) : null}
+                  <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "var(--c-text2)" }}>
+                    Company ID
+                    <input name="companyId" value={v.authForm.companyId} onChange={v.onAuthField} placeholder="zepto-hiring" autoComplete="username" autoCapitalize="none" spellCheck="false" style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-paper)", fontSize: "15px", color: "var(--c-ink)", outline: "none", fontFamily: "'Geist Mono',monospace", transition: "all .2s" }} className="dh12"/>
+                    {v.isRegister ? <span style={{ fontSize: "12px", fontWeight: "400", color: "var(--c-muted)" }}>Your team signs in with this. Lowercase letters, numbers and hyphens.</span> : null}
+                  </label>
+                  {v.isRegister ? (
+                    <>
+                      <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "var(--c-text2)" }}>
+                        Your name
+                        <input name="name" value={v.authForm.name} onChange={v.onAuthField} placeholder="Hiring manager’s name" autoComplete="name" style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-paper)", fontSize: "15px", color: "var(--c-ink)", outline: "none", transition: "all .2s" }} className="dh12"/>
+                      </label>
+                      <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "var(--c-text2)" }}>
+                        Work email
+                        <input name="email" type="email" value={v.authForm.email} onChange={v.onAuthField} placeholder="you@company.com" autoComplete="email" style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-paper)", fontSize: "15px", color: "var(--c-ink)", outline: "none", transition: "all .2s" }} className="dh12"/>
+                      </label>
+                    </>
+                  ) : null}
+                  <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "var(--c-text2)" }}>
+                    Password
+                    <input name="password" type="password" value={v.authForm.password} onChange={v.onAuthField} placeholder="••••••••" autoComplete={v.isRegister ? "new-password" : "current-password"} style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-paper)", fontSize: "15px", color: "var(--c-ink)", outline: "none", transition: "all .2s" }} className="dh12"/>
+                    {v.isRegister ? <span style={{ fontSize: "12px", fontWeight: "400", color: "var(--c-muted)" }}>At least 8 characters.</span> : null}
+                  </label>
+                </>
+              ) : (
+                <>
               {v.isRegister ? (
                 <>
                   {' '}
@@ -98,11 +141,14 @@ export default function AuthPage({ v }) {
                 {' '}
               </label>
               {' '}
+                </>
+              )}
               <button type="submit" style={{ marginTop: "6px", padding: "15px", borderRadius: "12px", border: "1.5px solid var(--c-ink)", background: "#5B4FF5", color: "#FFFEFB", fontSize: "15px", fontWeight: "600", cursor: "pointer", boxShadow: "4px 4px 0 0 var(--c-ink)", transition: "all .15s" }} className="dh15 dh16">
                 {v.authCta}
               </button>
               {' '}
             </form>
+            {v.googleButton}
             {' '}
           </div>
           {' '}

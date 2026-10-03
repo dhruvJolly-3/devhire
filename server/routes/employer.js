@@ -5,7 +5,9 @@ const auth = require('../middleware/auth');
 const Job = require('../models/Job');
 const Application = require('../models/Application');
 
-router.use(auth);
+const { requirePoster } = require('../utils/roles');
+
+router.use(auth, requirePoster);
 
 const STATUSES = ['New', 'Shortlisted', 'Rejected'];
 

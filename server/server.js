@@ -12,6 +12,8 @@ for (const key of ['MONGODB_URI', 'JWT_SECRET']) {
 }
 
 const app = express();
+// Render sits behind a proxy: use the real client IP for rate limiting.
+app.set('trust proxy', 1);
 
 // Browser origins allowed to call this API. Local dev origins are always
 // permitted; production origins come from CORS_ORIGINS (comma separated).

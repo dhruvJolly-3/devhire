@@ -5,6 +5,7 @@ const auth = require('../middleware/auth');
 const Job = require('../models/Job');
 const Application = require('../models/Application');
 const { matchScore } = require('../utils/match');
+const { requireApplicant } = require('../utils/roles');
 
 router.use(auth);
 
@@ -60,7 +61,7 @@ router.delete('/saved/:jobId', async (req, res) => {
 });
 
 // POST /api/me/applied/:jobId — record an application (idempotent).
-router.post('/applied/:jobId', async (req, res) => {
+router.post('/applied/:jobId', requireApplicant, async (req, res) => {
   try {
     const job = await findJob(req, res);
     if (!job) return;

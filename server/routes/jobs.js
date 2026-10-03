@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const auth = require('../middleware/auth');
+const { requirePoster, isCompany } = require('../utils/roles');
 const mongoose = require('mongoose');
 const Job = require('../models/Job');
 const Application = require('../models/Application');
@@ -38,15 +39,17 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST create job (protected — only logged-in employer can post)
-router.post('/', auth, async (req, res) => {
+// POST create job (company accounts only)
+router.post('/', auth, requirePoster, async (req, res) => {
   try {
     const {
       title, company, description, salary, location,
       tags, type, expLevel, domain, color, logoInitials
     } = req.body;
     const job = await Job.create({
-      title, company, description, salary, location,
+      title, description,
+      // A company account always posts under its own name.
+      company: isCompany(req.user) ? req.user.company : company, salary, location,
       tags, type, expLevel, domain, color, logoInitials,
       city: cityOf(location),
       postedBy: req.user._id
@@ -58,7 +61,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // PUT update job (protected — only the poster can edit)
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, requirePoster, async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
     if (!job) return res.status(404).json({ message: 'Job not found' });
@@ -67,6 +70,7 @@ router.put('/:id', auth, async (req, res) => {
     }
     const EDITABLE = ['title', 'company', 'description', 'salary', 'location', 'tags', 'type', 'expLevel', 'domain', 'color', 'logoInitials'];
     for (const key of EDITABLE) if (req.body[key] !== undefined) job[key] = req.body[key];
+    if (isCompany(req.user)) job.company = req.user.company;   // can't post as another company
     job.city = cityOf(job.location);
     await job.save();
     res.json(job);
@@ -76,7 +80,7 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // DELETE job (protected — only the poster can delete)
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', auth, requirePoster, async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
     if (!job) return res.status(404).json({ message: 'Job not found' });

@@ -12,6 +12,7 @@ import PostJobPage from './design/pages/PostJobPage';
 import DashboardPage from './design/pages/DashboardPage';
 import CompanyPage from './design/pages/CompanyPage';
 import { NavTools, CommandPalette, Toasts, BackToTop, SkeletonList, TopLoader, MobileMenu } from './design/extras';
+import GoogleButton from './design/GoogleButton';
 import { Marquee, Shimmer, LiveDot, Spinner, MatchRing, LetterBox, BgVideo } from './design/ambient';
 import useJobs from './hooks/useJobs';
 import useMyJobs from './hooks/useMyJobs';
@@ -30,7 +31,7 @@ import {
 // every action they trigger comes from the `v` object built here.
 
 const EMPTY_POST = { title: '', company: '', type: 'Remote', location: '', exp: '', salary: '', tags: '', description: '' };
-const EMPTY_AUTH = { name: '', email: '', password: '' };
+const EMPTY_AUTH = { name: '', email: '', password: '', company: '', companyId: '' };
 
 const readStoredUser = () => {
   try {
@@ -56,7 +57,27 @@ export default function App() {
   const theme = useTheme();
   const my = useMyJobs(user);
   const { profile, save: saveProfileApi, uploadResume } = useProfile(user);
-  const emp = useEmployer(user, !!user);
+  // Account type (mirrors server/utils/roles.js). Company accounts post and
+  // review; candidates save and apply. Sessions saved before roles existed
+  // have no role and keep both abilities until /auth/me refreshes them.
+  const isCompany = !!user?.isCompany;
+  const canPost = !!user && (!user.role || user.role === 'employer');
+  const emp = useEmployer(user, canPost);
+
+  // Refresh the saved user on load (role, company), or drop a dead session.
+  const hadUser = !!user;
+  useEffect(() => {
+    if (!hadUser) return;
+    api.get('/auth/me').then(res => {
+      setUser(res.data.user);
+      try { localStorage.setItem('user', JSON.stringify(res.data.user)); } catch { /* storage unavailable */ }
+    }).catch(err => {
+      if (err?.response?.status !== 401) return;
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
+    });
+  }, [hadUser]);
 
   // Job board filters
   const [query, setQuery] = useState(() => route.q || '');
@@ -157,7 +178,15 @@ export default function App() {
 
   // Dashboard: applicants for the selected listing.
   const selId = emp.listings.some(j => j._id === dashSel) ? dashSel : emp.listings[0]?._id;
-  const { applicants, loadApplicants } = emp;
+  const { applicants, loadApplicants, refresh: refreshDashboard } = emp;
+  useEffect(() => {
+    if (page !== 'dash') return;
+    refreshDashboard();
+    // Coming back to the tab also pulls in applications that arrived meanwhile.
+    const onVisible = () => { if (document.visibilityState === 'visible') refreshDashboard(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [page, refreshDashboard]);
   useEffect(() => {
     if (page === 'dash' && selId && !applicants[selId]) loadApplicants(selId);
   }, [page, selId, applicants, loadApplicants]);
@@ -165,9 +194,9 @@ export default function App() {
   // ── Actions ──────────────────────────────────────────────────────────────
   // Actions that need an account send signed-out users to sign in first, then
   // straight back. Replace, not push, so Back doesn't land on the same page.
-  const requireAuth = useCallback((next) => {
+  const requireAuth = useCallback((next, as) => {
     if (user) return true;
-    replace(loginPath(next));
+    replace(loginPath(next, as));
     return false;
   }, [user]);
 
@@ -181,26 +210,72 @@ export default function App() {
 
   // The landing page has its own sign-in card (#/?mode=register switches it).
   const isReg = page === 'auth' ? route.mode === 'register' : location.query.get('mode') === 'register';
+  // Company accounts sign in on #/login?as=company (the landing card is for candidates).
+  const asCompany = page === 'auth' && route.as === 'company';
+
+  // Save the session and go where the user was heading.
+  const finishAuth = (data, isNew) => {
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    setAuthForm(EMPTY_AUTH);
+    setAuthError('');
+    setUser(data.user);
+    const first = data.user.isCompany ? data.user.company : data.user.name.split(' ')[0];
+    toast(`Welcome${isNew ? '' : ' back'}, ${first}`, '👋');
+    replace(route.next || (data.user.isCompany ? '/dashboard' : '/jobs'));
+  };
+
+  // Client-side checks mirror the server's, so most mistakes show instantly.
+  const authProblem = (f) => {
+    if (asCompany) {
+      if (!f.companyId.trim() || !f.password) return 'Enter your Company ID and password.';
+      if (!isReg) return '';
+      if (!f.company.trim()) return 'Add your company name.';
+      if (!/^[a-z0-9][a-z0-9-]{2,29}$/.test(f.companyId.trim().toLowerCase())) return 'Company ID must be 3–30 characters: lowercase letters, numbers and hyphens.';
+      if (!f.name.trim()) return 'Add your name.';
+      if (!f.email.trim()) return 'Add your work email.';
+      if (f.password.length < 8) return 'Company passwords must be at least 8 characters.';
+      return '';
+    }
+    if (!f.email.trim() || !f.password) return 'Enter your email and password.';
+    if (isReg && !f.name.trim()) return 'Add your name to create an account.';
+    if (isReg && f.password.length < 6) return 'Password must be at least 6 characters.';
+    return '';
+  };
 
   const submitAuth = async (e) => {
     e.preventDefault();
     const f = authForm;
-    if (!f.email.trim() || !f.password) return setAuthError('Enter your email and password.');
-    if (isReg && !f.name.trim()) return setAuthError('Add your name to create an account.');
-    if (isReg && f.password.length < 6) return setAuthError('Password must be at least 6 characters.');
+    const problem = authProblem(f);
+    if (problem) return setAuthError(problem);
     setAuthBusy(true);
     try {
-      const body = isReg ? { name: f.name.trim(), email: f.email.trim(), password: f.password } : { email: f.email.trim(), password: f.password };
-      const res = await api.post(`/auth/${isReg ? 'register' : 'login'}`, body);
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      setAuthForm(EMPTY_AUTH);
-      setAuthError('');
-      setUser(res.data.user);
-      toast(`Welcome${isReg ? '' : ' back'}, ${res.data.user.name.split(' ')[0]}`, '👋');
-      replace(route.next || '/jobs');
+      let res;
+      if (asCompany) {
+        res = isReg
+          ? await api.post('/auth/company/register', { company: f.company.trim(), companyId: f.companyId.trim().toLowerCase(), name: f.name.trim(), email: f.email.trim(), password: f.password })
+          : await api.post('/auth/company/login', { companyId: f.companyId.trim().toLowerCase(), password: f.password });
+      } else {
+        const body = isReg ? { name: f.name.trim(), email: f.email.trim(), password: f.password } : { email: f.email.trim(), password: f.password };
+        res = await api.post(`/auth/${isReg ? 'register' : 'login'}`, body);
+      }
+      finishAuth(res.data, isReg);
     } catch (err) {
       setAuthError(errMsg(err, 'Could not reach the server. Is the backend running?'));
+    } finally {
+      setAuthBusy(false);
+    }
+  };
+
+  // Google: the button hands us an ID token; the server verifies it.
+  const onGoogle = async (credential) => {
+    setAuthBusy(true);
+    setAuthError('');
+    try {
+      const res = await api.post('/auth/google', { credential });
+      finishAuth(res.data, res.status === 201);
+    } catch (err) {
+      setAuthError(errMsg(err, 'Google sign-in failed. Please try again.'));
     } finally {
       setAuthBusy(false);
     }
@@ -291,6 +366,7 @@ export default function App() {
   };
 
   const applyJob = () => {
+    if (isCompany) return toast('Company accounts can’t apply. Sign in as a candidate to apply.', 'ℹ');
     if (!dj0 || !requireAuth(jobPath(dj0)) || detailApplied) return;
     // Open the tab first — browsers block popups opened after an await.
     if (dj0.applyUrl) window.open(dj0.applyUrl, '_blank', 'noopener,noreferrer');
@@ -348,18 +424,20 @@ export default function App() {
   // ── Post / edit a role ───────────────────────────────────────────────────
   const editing = page === 'post' && route.editId ? emp.listings.find(j => j._id === route.editId) : null;
   const postKey = page === 'post' ? (route.editId || 'new') : postDraft.key;
-  const post = postDraft.key === postKey ? postDraft.form : editing ? {
+  let post = postDraft.key === postKey ? postDraft.form : editing ? {
     title: editing.title || '', company: editing.company || '', type: editing.type || 'Remote',
     location: editing.type === 'Remote' ? '' : (editing.location || ''), exp: editing.expLevel || '', salary: editing.salary || '',
     tags: (editing.tags || []).join(', '), description: editing.description || '',
   } : EMPTY_POST;
+  // A company account always posts under its own company name.
+  if (isCompany && post.company !== user.company) post = { ...post, company: user.company };
   const setPost = (fields) => setPostDraft({ key: postKey, form: { ...post, ...fields } });
   const pvTags = post.tags.split(',').map(t => t.trim()).filter(Boolean);
 
   const submitPost = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
-    if (!requireAuth(route.editId ? `/post/${route.editId}` : '/post')) return;
+    if (!requireAuth(route.editId ? `/post/${route.editId}` : '/post', 'company') || !canPost) return;
     if (!post.title.trim() || !post.company.trim() || !post.description.trim()) {
       form.animate?.([{ transform: 'translateX(0)' }, { transform: 'translateX(-8px)' }, { transform: 'translateX(8px)' }, { transform: 'translateX(0)' }], { duration: 320 });
       (window.__lenis ? window.__lenis.scrollTo(0) : window.scrollTo({ top: 0, behavior: 'smooth' }));
@@ -425,16 +503,27 @@ export default function App() {
   const nextJob = route.next?.startsWith('/jobs/') ? jobs.find(j => jobPath(j) === route.next) : null;
   const tab = (on) => ({ bg: on ? 'var(--c-paper)' : 'transparent', fg: on ? 'var(--c-ink)' : 'var(--c-text3)', sh: on ? '0 1px 3px rgba(24,24,27,0.12)' : 'none' });
   const lt = tab(!isReg), rt = tab(isReg);
-  const authPath = (mode) => page === 'auth'
-    ? `/${mode}${route.next ? `?next=${encodeURIComponent(route.next)}` : ''}`
-    : (mode === 'register' ? '/?mode=register' : '/');
+  // Keeps ?as= and ?next= when switching between sign in / create account,
+  // or between the candidate and company forms.
+  const authPath = (mode, as = asCompany ? 'company' : 'candidate') => {
+    if (page !== 'auth') return mode === 'register' ? '/?mode=register' : '/';
+    const q = new URLSearchParams();
+    if (as === 'company') q.set('as', 'company');
+    if (route.next) q.set('next', route.next);
+    return `/${mode}${q.toString() ? `?${q}` : ''}`;
+  };
+  const switchRole = (as) => { setAuthError(''); replace(authPath(isReg ? 'register' : 'login', as)); };
   const switchAuth = (mode) => { setAuthError(''); replace(authPath(mode)); };
 
   // ── Navigation ───────────────────────────────────────────────────────────
   const navPage = page === 'detail' || page === 'company' ? 'home' : page;
-  const nav = user
-    ? [['home', 'Jobs', '/jobs'], ['me', 'My jobs', '/me'], ['post', 'Post a role', '/post'], ['dash', 'Dashboard', '/dashboard']]
-    : [['home', 'Jobs', '/jobs'], ['post', 'Post a role', '/post']];
+  const nav = !user ? [['home', 'Jobs', '/jobs'], ['post', 'Post a role', '/post']]
+    : isCompany ? [['home', 'Jobs', '/jobs'], ['post', 'Post a role', '/post'], ['dash', 'Dashboard', '/dashboard']]
+    : canPost ? [['home', 'Jobs', '/jobs'], ['me', 'My jobs', '/me'], ['post', 'Post a role', '/post'], ['dash', 'Dashboard', '/dashboard']]
+    : [['home', 'Jobs', '/jobs'], ['me', 'My jobs', '/me']];
+
+  // Candidates can't open the employer dashboard.
+  useEffect(() => { if (page === 'dash' && user?.role === 'candidate') replace('/jobs'); }, [page, user]);
 
   const v = {
     progress: '0%',
@@ -461,9 +550,19 @@ export default function App() {
     latest: newest.map(decorate),
 
     // Auth
-    authTitle: isReg ? 'Create your account' : 'Welcome back',
-    authSub: isReg ? 'Free for developers. Save jobs, track applications, get AI match scores.' : 'Sign in to apply, save jobs and see your match score.',
-    authEyebrow: isReg ? '/ JOIN DEVHIRE' : '/ SIGN IN', authCta: authBusy ? 'Please wait…' : isReg ? 'Create account →' : 'Sign in →',
+    authTitle: asCompany ? (isReg ? 'Set up your company' : 'Company sign in') : (isReg ? 'Create your account' : 'Welcome back'),
+    authSub: asCompany
+      ? (isReg ? 'Pick a Company ID for your hiring team, then post roles and review applicants.' : 'Sign in with your Company ID to post roles and review applicants.')
+      : (isReg ? 'Free for developers. Save jobs, track applications, get AI match scores.' : 'Sign in to apply, save jobs and see your match score.'),
+    authEyebrow: asCompany ? '/ FOR HIRING TEAMS' : isReg ? '/ JOIN DEVHIRE' : '/ SIGN IN',
+    authCta: authBusy ? 'Please wait…' : asCompany ? (isReg ? 'Create company account →' : 'Sign in →') : (isReg ? 'Create account →' : 'Sign in →'),
+    isCompanyAuth: asCompany,
+    roleTabs: [
+      { key: 'candidate', icon: '👩‍💻', label: 'Candidate', sub: 'Find and apply to roles', on: !asCompany, onClick: () => switchRole('candidate') },
+      { key: 'company', icon: '🏢', label: 'Company', sub: 'Sign in with Company ID', on: asCompany, onClick: () => switchRole('company') },
+    ],
+    googleButton: asCompany ? null : <GoogleButton dark={theme.dark} text={isReg ? 'signup_with' : 'continue_with'} onCredential={onGoogle} onError={setAuthError}/>,
+    goCompanyLogin: () => go('/login?as=company'),
     isRegister: isReg, authForm, authError,
     authNotice: route.next ? (nextJob ? `Sign in to continue with ${nextJob.title} at ${nextJob.company}.` : 'Sign in to continue — we’ll take you straight back.') : '',
     authSwitchPre: isReg ? 'Already have an account? ' : 'New to DevHire? ', authSwitchLink: isReg ? 'Sign in' : 'Create an account',
@@ -494,11 +593,11 @@ export default function App() {
 
     // Job detail
     dj, applyJob,
-    applyLabel: detailApplied ? '✓ Applied' : !user ? 'Sign in to apply' : dj0?.applyUrl ? 'Apply on company site ↗' : 'Apply on DevHire →',
+    applyLabel: detailApplied ? '✓ Applied' : !user ? 'Sign in to apply' : isCompany ? 'Candidates apply here' : dj0?.applyUrl ? 'Apply on company site ↗' : 'Apply on DevHire →',
     applyBg: detailApplied ? '#0F6E56' : '#5B4FF5',
     share: () => { copy(window.location.href); setShareCopied(true); toast('Link copied'); setTimeout(() => setShareCopied(false), 1800); },
     shareLabel: shareCopied ? '✓ Link copied' : 'Copy link',
-    aiNeedsAuth: !user, aiNeedsResume: !!user && !hasResume, aiReady: !!user && hasResume,
+    showAi: !isCompany, aiNeedsAuth: !user, aiNeedsResume: !!user && !hasResume, aiReady: !!user && hasResume,
     signInForJob: () => requireAuth(here()),
     noMatch: !match, hasMatch: !!match,
     matchBtn: jobAi.matchBusy ? 'Comparing…' : jobAi.matchError ? 'Try again' : 'Check my match', runMatch,
@@ -539,7 +638,16 @@ export default function App() {
     saveProfile, saveProfileLabel: pfSaving ? 'Saving…' : 'Save profile', pfMsg, pfMsgColor: pfErr ? 'var(--c-red)' : 'var(--c-green)',
 
     // Post
-    signInForPost: () => requireAuth('/post'),
+    // Posting needs a company account. A signed-in candidate is offered to
+    // switch: sign out, then the Company ID form brings them back here.
+    postOpen: canPost, postLocked: !canPost, companyLocked: isCompany,
+    postGateText: user ? 'Roles are posted from a company account. Sign in with your Company ID, or set one up for your team in a minute.' : 'Sign in with your company account to post. New here? Set up a Company ID for your team in a minute.',
+    postGateCta: user ? 'Switch to a company account →' : 'Sign in with Company ID →',
+    signInForPost: () => {
+      if (!user) return requireAuth('/post', 'company');
+      signOut();
+      replace(loginPath('/post', 'company'));
+    },
     post, onPost: (e) => { const { name, value } = e.target; setPost({ [name]: value }); setPostError(''); },
     postTypes: TYPES.map(t => ({ label: t, ...pill(post.type === t), onClick: () => setPost({ type: t }) })),
     submitPost, postError, postDone: !!postDone && !route.editId, viewPosted: () => go(`/jobs/${postDone}`),

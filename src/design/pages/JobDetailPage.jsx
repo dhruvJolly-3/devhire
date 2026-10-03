@@ -167,6 +167,7 @@ export default function JobDetailPage({ v }) {
               {' '}
             </div>
             {' '}
+            {v.showAi ? (
             <div data-rise="4" style={{ position: "relative" }}>
               {' '}
               <div aria-hidden="true" style={{ position: "absolute", inset: "0", borderRadius: "14px", background: "#D2F53B", transform: "translate(8px,8px)", border: "1.5px solid var(--c-ink)" }}/>
@@ -369,6 +370,7 @@ export default function JobDetailPage({ v }) {
               </div>
               {' '}
             </div>
+            ) : null}
             {' '}
           </div>
           {' '}

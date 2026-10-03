@@ -8,7 +8,7 @@ export default function PostJobPage({ v }) {
       {' '}
       <div data-screen-label="07 Post a job" style={{ maxWidth: "1200px", margin: "0 auto", padding: "56px 32px 112px" }}>
         {' '}
-        {v.signedOut ? (
+        {v.postLocked ? (
           <>
             {' '}
             <div style={{ display: "flex", gap: "56px", alignItems: "center", flexWrap: "wrap" }}>
@@ -24,11 +24,11 @@ export default function PostJobPage({ v }) {
                 </h1>
                 {' '}
                 <p style={{ margin: "0", fontSize: "16px", lineHeight: "1.6", color: "var(--c-text3)" }}>
-                  You need an account before you can post. It takes about twenty seconds.
+                  {v.postGateText}
                 </p>
                 {' '}
                 <button onClick={v.signInForPost} style={{ alignSelf: "flex-start", marginTop: "8px", padding: "14px 24px", borderRadius: "12px", border: "1.5px solid var(--c-ink)", background: "#5B4FF5", color: "#FFFEFB", fontSize: "15px", fontWeight: "600", cursor: "pointer", boxShadow: "4px 4px 0 0 var(--c-ink)" }}>
-                  Sign in to continue →
+                  {v.postGateCta}
                 </button>
                 {' '}
               </div>
@@ -40,7 +40,7 @@ export default function PostJobPage({ v }) {
           </>
         ) : null}
         {' '}
-        {v.signedIn ? (
+        {v.postOpen ? (
           <>
             {' '}
             <div style={{ display: "flex", gap: "56px", alignItems: "flex-start", flexWrap: "wrap" }}>
@@ -99,7 +99,7 @@ export default function PostJobPage({ v }) {
                   {' '}
                   <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: "500", color: "var(--c-text2)" }}>
                     Company{' '}
-                    <input name="company" value={v.post.company} onChange={v.onPost} placeholder="Zepto" style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-paper)", fontSize: "15px", color: "var(--c-ink)", outline: "none", transition: "all .2s" }} className="dh42"/>
+                    <input name="company" value={v.post.company} onChange={v.onPost} readOnly={v.companyLocked} title={v.companyLocked ? "Posting as your company account" : undefined} placeholder="Zepto" style={{ padding: "13px 14px", borderRadius: "10px", border: "1px solid var(--c-line2)", background: "var(--c-paper)", fontSize: "15px", color: "var(--c-ink)", outline: "none", transition: "all .2s" }} className="dh42"/>
                     {' '}
                   </label>
                   {' '}
