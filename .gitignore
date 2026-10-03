@@ -31,3 +31,6 @@ dist-ssr
 *.sln
 *.sw?
 .DS_Store
+
+# macOS / iCloud duplicate copies ("file 2.js")
+* [0-9].*
