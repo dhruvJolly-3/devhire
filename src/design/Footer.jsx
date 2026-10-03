@@ -19,7 +19,7 @@ const SOCIAL = [
 ];
 
 export default function Footer({ v }) {
-  const links = [['Browse jobs', v.goHome], ['Post a role', v.goPost], ...(v.signedIn ? [['My jobs', v.goMe], ['Your profile', v.goProfile]] : [['Sign in', v.goAuth]])];
+  const links = (v.footerLinks || []).map(([label, path]) => [label, () => { window.location.hash = path; }]);
   return (
     <footer style={{ position: 'relative', overflow: 'hidden', borderTop: '1px solid var(--c-line)', background: 'linear-gradient(180deg, var(--c-bg), var(--c-sunk))' }}>
       <div aria-hidden="true" style={{ position: 'absolute', left: 0, right: 0, bottom: -18, fontSize: 'clamp(80px,17vw,230px)', fontWeight: 700, letterSpacing: '-0.06em', lineHeight: 0.8, color: 'transparent', WebkitTextStroke: '1.5px var(--c-stroke)', textAlign: 'center', pointerEvents: 'none', userSelect: 'none' }}>

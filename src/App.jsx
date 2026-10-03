@@ -57,12 +57,12 @@ export default function App() {
   const theme = useTheme();
   const my = useMyJobs(user);
   const { profile, save: saveProfileApi, uploadResume } = useProfile(user);
-  // Account type (mirrors server/utils/roles.js). Company accounts post and
-  // review; candidates save and apply. Sessions saved before roles existed
-  // have no role and keep both abilities until /auth/me refreshes them.
+  // Account type. Company accounts (signed in with a Company ID) post roles
+  // and review applicants; every other account is a candidate, including
+  // accounts created before roles existed.
   const isCompany = !!user?.isCompany;
-  const canPost = !!user && (!user.role || user.role === 'employer');
-  const emp = useEmployer(user, canPost);
+  const canPost = isCompany;
+  const emp = useEmployer(user, isCompany);
 
   // Refresh the saved user on load (role, company), or drop a dead session.
   const hadUser = !!user;
@@ -534,13 +534,15 @@ export default function App() {
 
   // ── Navigation ───────────────────────────────────────────────────────────
   const navPage = page === 'detail' || page === 'company' ? 'home' : page;
+  // Each account type only sees its own side of the site.
   const nav = !user ? [['home', 'Jobs', '/jobs'], ['post', 'Post a role', '/post']]
-    : isCompany ? [['home', 'Jobs', '/jobs'], ['post', 'Post a role', '/post'], ['dash', 'Dashboard', '/dashboard']]
-    : canPost ? [['home', 'Jobs', '/jobs'], ['me', 'My jobs', '/me'], ['post', 'Post a role', '/post'], ['dash', 'Dashboard', '/dashboard']]
+    : isCompany ? [['post', 'Post a role', '/post'], ['dash', 'Dashboard', '/dashboard']]
     : [['home', 'Jobs', '/jobs'], ['me', 'My jobs', '/me']];
+  // A company's "home" is its dashboard; a candidate's is the job board.
+  const homePath = isCompany ? '/dashboard' : '/jobs';
 
-  // Candidates can't open the employer dashboard.
-  useEffect(() => { if (page === 'dash' && user?.role === 'candidate') replace('/jobs'); }, [page, user]);
+  // Only company accounts can open the employer dashboard.
+  useEffect(() => { if (page === 'dash' && user && !user.isCompany) replace('/jobs'); }, [page, user]);
 
   const v = {
     progress: '0%',
@@ -548,14 +550,18 @@ export default function App() {
     signedIn: !!user, signedOut: !user,
     userInitial: user?.name?.charAt(0).toUpperCase() || '', userName: user?.name?.split(' ')[0] || '', userEmail: user?.email || profile?.email || '',
     avatarRing: page === 'profile' ? '0 0 0 3px var(--c-bg),0 0 0 5px #5B4FF5' : 'none',
-    goLanding: () => go(user ? '/jobs' : '/'), goHome: () => go('/jobs'), goPost: () => go('/post'),
-    goAuth: () => go('/login'), goProfile: () => go('/profile'), goMe: () => go('/me'),
+    goLanding: () => go(user ? homePath : '/'), goHome: () => go(homePath), goPost: () => go('/post'),
+    goAuth: () => go('/login'), goProfile: () => go(isCompany ? '/dashboard' : '/profile'), goMe: () => go('/me'),
     signOut,
     menuButton: <MobileMenu items={[
       ...nav.map(([k, label, path]) => ({ label, current: navPage === k, onClick: () => go(path) })),
       { label: '—', divider: true },
       ...(user ? [{ label: 'Your profile', current: page === 'profile', onClick: () => go('/profile') }, { label: 'Sign out', onClick: signOut }] : [{ label: 'Sign in', onClick: () => go('/login') }, { label: 'Create an account', onClick: () => go('/register') }]),
     ]}/>,
+    // Footer "Explore" links, per account type.
+    footerLinks: !user ? [['Browse jobs', '/jobs'], ['Post a role', '/post'], ['Sign in', '/login']]
+      : isCompany ? [['Dashboard', '/dashboard'], ['Post a role', '/post']]
+      : [['Browse jobs', '/jobs'], ['My jobs', '/me'], ['Your profile', '/profile']],
     navTools: <NavTools dark={theme.dark} onToggleTheme={theme.toggle} onSearch={() => { setCmdQuery(''); setCmdOpen(true); }}/>,
 
     // Landing
@@ -725,20 +731,22 @@ export default function App() {
 
   // Command palette contents: matching jobs + companies, then pages and actions.
   const cq = cmdQuery.trim().toLowerCase();
-  const cmdJobs = cq ? jobs.filter(j => `${j.title} ${j.company} ${j.city} ${j.tags.join(' ')}`.toLowerCase().includes(cq)).slice(0, 6) : newest;
+  // Companies search their own listings; everyone else searches the board.
+  const cmdPool = isCompany ? listings : jobs;
+  const cmdJobs = cq ? cmdPool.filter(j => `${j.title} ${j.company} ${j.city} ${j.tags.join(' ')}`.toLowerCase().includes(cq)).slice(0, 6) : isCompany ? listings.slice(0, 5) : newest;
   const cmdCompanies = cq ? [...new Set(jobs.map(j => j.company))].filter(c => c.toLowerCase().includes(cq)).slice(0, 4) : [];
   const actions = [
-    ['⌕', 'Browse all jobs', () => go('/jobs')],
-    ['＋', 'Post a role', () => go('/post')],
-    ...(user ? [['★', 'My saved & applied jobs', () => go('/me')], ['▦', 'Employer dashboard', () => go('/dashboard')], ['☺', 'Edit profile & resume', () => go('/profile')]] : [['→', 'Sign in', () => go('/login')], ['✦', 'Create an account', () => go('/register')]]),
+    ...(!user ? [['⌕', 'Browse all jobs', () => go('/jobs')], ['＋', 'Post a role', () => go('/post')], ['→', 'Sign in', () => go('/login')], ['✦', 'Create an account', () => go('/register')]]
+      : isCompany ? [['▦', 'Employer dashboard', () => go('/dashboard')], ['＋', 'Post a role', () => go('/post')]]
+      : [['⌕', 'Browse all jobs', () => go('/jobs')], ['★', 'My saved & applied jobs', () => go('/me')], ['☺', 'Edit profile & resume', () => go('/profile')]]),
     [theme.dark ? '☀' : '☾', theme.dark ? 'Switch to light mode' : 'Switch to dark mode', () => theme.toggle()],
     ...(user ? [['⎋', 'Sign out', signOut]] : []),
   ].filter(([, label]) => !cq || label.toLowerCase().includes(cq)).map(([icon, label, run]) => ({ icon, label, run }));
   const cmdSections = [
-    { title: cq ? 'Jobs' : 'Latest jobs', items: cmdJobs.map(j => ({ icon: '◆', label: j.title, sub: `${j.company} · ${j.city}`, run: () => go(jobPath(j)) })) },
+    { title: isCompany ? 'Your listings' : cq ? 'Jobs' : 'Latest jobs', items: cmdJobs.map(j => ({ icon: '◆', label: j.title, sub: `${j.company} · ${j.city}`, run: () => go(jobPath(j)) })) },
     { title: 'Companies', items: cmdCompanies.map(c => ({ icon: '▣', label: c, sub: 'Company page', run: () => go(`/company/${encodeURIComponent(c)}`) })) },
     { title: 'Go to', items: actions },
-    ...(cq ? [{ title: 'Search', items: [{ icon: '⌕', label: `Search the board for “${cmdQuery.trim()}”`, run: () => { setQuery(cmdQuery.trim()); setPageNum(1); go('/jobs'); } }] }] : []),
+    ...(cq && !isCompany ? [{ title: 'Search', items: [{ icon: '⌕', label: `Search the board for “${cmdQuery.trim()}”`, run: () => { setQuery(cmdQuery.trim()); setPageNum(1); go('/jobs'); } }] }] : []),
   ];
 
   return (

@@ -1,8 +1,9 @@
-// Who may do what. A company account (has a companyId) posts and reviews; a
-// candidate saves and applies. Legacy accounts (role "employer", no companyId)
-// were created before roles existed and keep both abilities.
+// Who may do what. A company account (signed in with a Company ID) posts
+// roles and reviews applicants; every other account is a candidate that
+// saves and applies. Accounts created before roles existed count as
+// candidates.
 const isCompany = (u) => u?.role === 'employer' && !!u.companyId;
-const canPost = (u) => u?.role === 'employer';
+const canPost = (u) => isCompany(u);
 const canApply = (u) => !!u && !isCompany(u);
 
 // Express guards: 403 with a clear message instead of a silent failure.

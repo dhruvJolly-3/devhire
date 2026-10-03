@@ -5,8 +5,8 @@ const bcrypt = require('bcryptjs');
 //   candidate: signs in with Google or email + password; browses, saves and applies.
 //   employer:  a company account; signs in with its Company ID + password and
 //              posts roles / reviews applicants.
-// Accounts created before roles existed have role "employer" and no companyId;
-// they keep both abilities (see utils/roles.js).
+// Accounts created before roles existed have role "employer" but no
+// companyId; they are treated as candidates (see utils/roles.js).
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true, maxlength: 80 },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
